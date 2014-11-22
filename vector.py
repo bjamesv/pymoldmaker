@@ -28,7 +28,12 @@ if __name__ == '__main__':
     print(mesh.sections())
     ## test a modification to the file & resave
     file_new = 'cubeMOD.dae'
-    mesh.save_lines( file_new)
+    # start a line from an arbitrary point
+    poly_line_xyz = [ 50,-50,50]
+    # .. and then extend to the corner of the model
+    for vertex_float in mesh.get_corner():
+        poly_line_xyz.append( vertex_float)
+    mesh.save_lines( file_new, poly_line_xyz)
     ## test exporting to EPS
     img = Canvas()
     poly_line_mm = (  (80,80),(320,80)

@@ -22,6 +22,7 @@ from collada.lineset import LineSet
 from collada.source import InputList
 from collada.source import FloatSource
 import numpy
+import uuid
 
 from collada import material
 from collada.geometry import Geometry
@@ -77,22 +78,13 @@ class Mesh:
         """
         pass
         
-    def create_lines(self):
-        """ returns a new Node representing a geometry that will add some lines
-         to the COLLADA scene """
-        vert_floats = [-50,50,50
-                      ,50,50,50
-                      ,-50,-50,50
-                      ,50,-50,50]
-        print("verts: {}".format(len(vert_floats)))
-        normal_floats = [0,0,1,0,0,1,0,0,1,0,0,1,0,1,0,
-            0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,-1,0,0,
-            -1,0,0,-1,0,0,-1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,-1,
-            0,0,-1,0,0,-1,0,0,-1]
-        print("normals:"+str(len(normal_floats)))
-        vert_src = FloatSource("cubeverts-array", numpy.array(vert_floats), ('X', 'Y', 'Z'))
-        normal_src = FloatSource("cubenormals-array", numpy.array(normal_floats), ('X', 'Y', 'Z'))
-        geom = Geometry(self.mesh, "geometry0", "mycube", [vert_src, normal_src])
+    def create_lines(self, list_vert_floats):
+        """ adds a new Node representing the geometry of a line to the COLLADA 
+        scene """
+        node_uuid = uuid.uuid1()
+        vert_src = FloatSource("cubeverts-array", numpy.array(list_vert_floats)
+                                                , ('X', 'Y', 'Z'))
+        geom = Geometry(self.mesh, "geometry0", "line", [vert_src])
         # InputList will consist of one item, a set of vertices
         input_list = InputList()
         input_list.addInput(0, 'VERTEX', "#cubeverts-array")
@@ -106,30 +98,40 @@ class Mesh:
         geom.primitives.append( lineset)
         self.mesh.geometries.append(geom)
         mat_list = []
-        geomnode = GeometryNode(geom, mat_list) #matnode])
+        geomnode = GeometryNode(geom, mat_list)
         node = Node("node0", children=[geomnode])
-        #myscene = Scene("myscene", [node])
-        #self.mesh.scenes.append(myscene)
-        # add Node to existing visual_scene
         self.mesh.scene.nodes.append( node)
-        """geom = self.geometry()
-    	indices_for_inputlist = numpy.array([0,1])
-        inputlist = InputList()
-        # define a source of coordinates for line endpoints
-        vert_floats = [-50,50,50,50,50,50]
-        vert_array = numpy.array(vert_floats)
-        vert_src_id = "lineverts-array"
-        vert_src = FloatSource( vert_src_id, vert_array, ('X', 'Y', 'Z'))
-        # specifiy VERTEX contents, per:
-        # pycollada.github.io/reference/generated/collada.source.InputList.html
-        offset = 0 # index starts & stays at 0, b/c we only add 1x source
-        inputlist.addInput( offset, 'VERTEX','#'+vert_src_id)
-        materialid = None
-        geom.createLineSet( indices_for_inputlist, inputlist, materialid)"""
+
+    def get_corner(self):
+        """ locate a feature of the model, the top south-west corner
+        """
+        tri_set = self.primitives()[0]
+        np_array  = tri_set.vertex
+        x = []
+        y = []
+        z = []
+        # can numpy array be turned sideways?
+        for three_tuple in np_array:
+            x.append( three_tuple[0])
+            y.append( three_tuple[1])
+            z.append( three_tuple[2])
+        x.sort()
+        x_asc = x 
+        y.sort()
+        y_asc = y
+        z.sort()
+        #z.reverse()
+        z_dec = z
+        return [ x_asc[0], y_asc[0], z_dec[0]]
+        #inspect = ret
+        #print( type( inspect))
+        #print( inspect)
+        #print( dir( inspect))
+    
         
-    def save_lines(self, file_path):
+    def save_lines(self, file_path, list_vert_floats):
         """ Adds a line_set to the current model & saves the resulting COLLADA
         scene as a new file.
         """
-        line_set = self.create_lines()
+        line_set = self.create_lines( list_vert_floats)
         self.mesh.write(file_path)
