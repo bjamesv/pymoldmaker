@@ -23,6 +23,7 @@ from collada.source import InputList
 from collada.source import FloatSource
 import numpy
 import uuid
+import math
 
 from collada import material
 from collada.geometry import Geometry
@@ -70,13 +71,50 @@ class Mesh:
         else:
             ## list of mesh geometries was exhausted, without finding a LineSet
             raise Exception("No LineSet found in the list of mesh geometries!")
-            
-    def sections(self):
+
+    def dist_between( self, vert1, vert2):
+        """ simple calculation of the distance between two vertices
         """
-        Returns the coordinates of the first face of the cube/model
+        xd = vert1[0] - vert2[0]
+        yd = vert1[1] - vert2[1]
+        zd = vert1[2] - vert2[2]
+        xy_hypotenuse = math.sqrt( xd**xd + yd**yd)
+        return math.sqrt( xy_hypotenuse**xy_hypotenuse + zd**zd)
+            
+    def sections(self, material_thickness_mm=6):
+        """
+        Returns a list of vertex coodinates of the form [ x1, y1,z1, x2, y2, z2
+        , ...] representing a set of line segments, defining the geometry of a 
+        slice of final plaster mould blank.
         ##TODO: provide prototype implementation for the model slicing function
         """
-        pass
+        list_ret = []
+        scale = 25.38 # TODO: is this correct? ..how is 4.23 * 6 units per derived?
+        # define a rectangle for the left side
+        corner_top_NW = self.get_corner( [-1,1,1])
+        corner_bot_NW = self.get_corner( [-1,1,-1])
+        list_ret.append( corner_top_NW)
+        # list_ret.append ([50,50,-50])
+        list_ret.append( corner_bot_NW)
+        # list_ret.append ([50,50,50])
+        # line segment2
+        list_ret.append( corner_bot_NW)
+        list_ret.append( self.get_corner( [-1,-1,-1]))
+        # line segment3
+        list_ret.append( self.get_corner( [-1,-1,-1]))
+        list_ret.append( self.get_corner( [-1,-1,1]))
+        # line segment4
+        list_ret.append( self.get_corner( [-1,-1,1]))
+        list_ret.append( self.get_corner( corner_top_NW))
+        # insert another set of lines, shifted material_thickness_mm to the Right
+        l2 = list( list_ret)
+        #inspect = l2
+        #print( type( inspect))
+        #print( inspect)
+        #print( dir( inspect))    
+        for vert in l2:
+            list_ret.append( [ vert[0]+(material_thickness_mm/scale), vert[1], vert[2] ])
+        return list_ret
         
     def create_lines(self, list_vert_floats):
         """ adds a new Node representing the geometry of a line to the COLLADA 
@@ -102,32 +140,51 @@ class Mesh:
         node = Node("node0", children=[geomnode])
         self.mesh.scene.nodes.append( node)
 
-    def get_corner(self):
-        """ locate a feature of the model, the top south-west corner
+    def get_corner(self, list_directional):
+        """ returns one of the six vertices of a rectangular poly that encloses
+         the imported model. Which vertex is determined by parameter 
+        list_directional
+        list_directional a 3D coordinate tuple, representing the endpoint of a 
+            directional vector extending from the origin. (eg: [-1,-1, ] 
+            indicates the top-most, vertex in the south-west quadrant should be
+            returned.
         """
         tri_set = self.primitives()[0]
         np_array  = tri_set.vertex
         x = []
         y = []
         z = []
-        # can numpy array be turned sideways?
+        #Sort all vertex values
+        # TODO: can numpy array be turned sideways? to eliminate need to
         for three_tuple in np_array:
             x.append( three_tuple[0])
             y.append( three_tuple[1])
             z.append( three_tuple[2])
-        x.sort()
-        x_asc = x 
+        x.sort() 
         y.sort()
-        y_asc = y
         z.sort()
-        #z.reverse()
-        z_dec = z
-        return [ x_asc[0], y_asc[0], z_dec[0]]
+        # determine vertex coordinates of a rectangular poly that encloses the 
+        # imported model
+        direction_x = list_directional[0]
+        direction_y = list_directional[1]
+        direction_z = list_directional[2]
+        if direction_x > 0:
+            # the smallest x coordinate value is not wanted,
+            # reverse the list, so the largest vertex x-value is returned
+            x.reverse()
+        if direction_y > 0:
+            # the smallest y coordinate value is not wanted,
+            # reverse the list, so the largest vertex y-value is returned
+            y.reverse()
+        if direction_z > 0:
+            # the smallest z coordinate value is not wanted,
+            # reverse the list, so the largest vertex z-value is returned
+            z.reverse()
+        return [ x[0], y[0], z[0]]
         #inspect = ret
         #print( type( inspect))
         #print( inspect)
-        #print( dir( inspect))
-    
+        #print( dir( inspect))    
         
     def save_lines(self, file_path, list_vert_floats):
         """ Adds a line_set to the current model & saves the resulting COLLADA

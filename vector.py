@@ -23,16 +23,13 @@ from ImportMesh import Mesh
 
 if __name__ == '__main__':
     ## import a simple Sketchup COLLADA file
-    mesh = Mesh('cube.dae')
+    mesh = Mesh('positive_for_mold.dae')
     print(mesh.lines())
     print(mesh.sections())
     ## test a modification to the file & resave
     file_new = 'cubeMOD.dae'
     # start a line from an arbitrary point
-    poly_line_xyz = [ 50,-50,50]
-    # .. and then extend to the corner of the model
-    for vertex_float in mesh.get_corner():
-        poly_line_xyz.append( vertex_float)
+    poly_line_xyz = mesh.sections()
     mesh.save_lines( file_new, poly_line_xyz)
     ## test exporting to EPS
     img = Canvas()
