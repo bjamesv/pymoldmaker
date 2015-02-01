@@ -86,6 +86,7 @@ class Mesh:
         Returns a list of vertex coodinates of the form [ x1, y1,z1, x2, y2, z2
         , ...] representing a set of line segments, defining the geometry of a 
         slice of final plaster mould blank.
+        ##TODO: deprecated - see ImportMesh.VectorMesh
         ##TODO: provide prototype implementation for the model slicing function
         """
         list_ret = []
@@ -135,10 +136,16 @@ class Mesh:
         lineset = geom.createLineSet( indices, input_list, "materialref")
         geom.primitives.append( lineset)
         self.mesh.geometries.append(geom)
+        # Add lines to COLLADA scene as a transformed Node /w geometry
+        existing_scene_transforms = self.mesh.scene.nodes[0].children[0].transforms
+        self.mesh.scene.nodes[0].children[0].transforms = []
+        # build + add no
         mat_list = []
         geomnode = GeometryNode(geom, mat_list)
         node = Node("node0", children=[geomnode])
+        #node.transforms.append(existing_scene_transforms[0])
         self.mesh.scene.nodes.append( node)
+        pass
 
     def get_corner(self, list_directional):
         """ returns one of the six vertices of a rectangular poly that encloses

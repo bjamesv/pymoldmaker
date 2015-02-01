@@ -18,18 +18,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from OutputVector import Canvas
-from ImportMesh import Mesh
+from ImportMesh import VectorMesh
 
 
 if __name__ == '__main__':
     ## import a simple Sketchup COLLADA file
-    mesh = Mesh('positive_for_mold.dae')
-    print(mesh.lines())
-    print(mesh.sections())
+    mesh = VectorMesh('positive_for_mold.dae')
     ## test a modification to the file & resave
     file_new = 'cubeMOD.dae'
-    # start a line from an arbitrary point
-    poly_line_xyz = mesh.sections()
+    # start a line from an arbitrary point - TODO: deprecated
+    # poly_line_xyz = mesh.sections() # TODO: deprecated
+    poly_line_xyz = list()
+    s = mesh.bottomSections()
+    for section in s:
+        for triplet in section:
+            poly_line_xyz.extend( triplet)
     mesh.save_lines( file_new, poly_line_xyz)
     ## test exporting to EPS
     img = Canvas()

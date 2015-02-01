@@ -1,0 +1,19 @@
+Features:
+ 1. Corners:
+    - ensure enough thickness to cut the corner angles
+    - create multiples of pieces as required, so final thicknesses may be built
+ up
+    implementation:
+    a) ensure one side of the joint has sufficient thickness for the corner cut
+    b) ensure joint has sufficient combined thickness for a corner cut through 
+both pieces
+
+ 2. Outer dimensions
+    - Produce vector outlines of each piece of the positive for the mold
+    - dynamically size each piece according to desired jointing & piece 
+thickness
+    implementation:
+    a) hardcoded size/outlines for each piece
+    b) Automated outline detection, via COLLADA model
+
+
