@@ -28,12 +28,12 @@ class VectorMesh ( Mesh ):
     # inventory of pieces of material (wood, plastic, etc.) needed to assemble
     # the mold-making positive
 
-    material = { 'thickness_mm': 6}
+    material = { 'thickness_mm': 6, 'kerf_mm': 0.4}
     # dictionary of characteristics, possessed by the material the mold-making 
     # positive will be fabricated from
 
     bottom_parts = []
-    # list comprehensive representing x,y,z coordinate outlines of the pieces 
+    # list representing x,y,z coordinate outlines of the pieces 
     # needed to assemble/build up the 'base'/bottom side of the molding 
     # positive
 
@@ -73,6 +73,7 @@ class VectorMesh ( Mesh ):
         part_sections = []
         list_ret = []
         material_thickness_mm = self.material['thickness_mm']
+        material_half_kerf_mm = 0.5 * self.material['kerf_mm']
         scale = 25.38 # TODO: is this correct? ..how is 4.23 * 6 units per derived?
         sections_needed = self.sectionsNeededToCompleteXyPlaneCut()
         part_thickness_mm = sections_needed*material_thickness_mm
@@ -82,6 +83,13 @@ class VectorMesh ( Mesh ):
         # (shrink from the west side, to make room for the part on that side.)
         corner_top_NW[1] -= part_thickness_mm/scale
         corner_bot_NW[1] -= part_thickness_mm/scale
+        ''' adjust for half of the cutting tool's kerf (other half of kerf lies
+            outside our cut line & for the part dimensions can be ignored)'''
+        corner_top_NW[1] += material_half_kerf_mm/scale
+        corner_bot_NW[1] += material_half_kerf_mm/scale
+        # (and make part taller, also to account for 1/2 kerf width)
+        corner_top_NW[2] += material_half_kerf_mm/scale
+        corner_bot_NW[2] -= material_half_kerf_mm/scale
         list_ret.append( corner_top_NW)
         list_ret.append( corner_bot_NW)
         # line segment2
@@ -91,6 +99,12 @@ class VectorMesh ( Mesh ):
         corner_top_NE = self.get_corner( [-1,-1,1])
         corner_bot_NE[1] += part_thickness_mm/scale
         corner_top_NE[1] += part_thickness_mm/scale
+        # adjust for 1/2 of the cutting tool's kerf width
+        corner_bot_NE[1] -= material_half_kerf_mm/scale
+        corner_top_NE[1] -= material_half_kerf_mm/scale
+        # (again, make part taller to account for the cut's 1/2 kerf width)
+        corner_top_NE[2] += material_half_kerf_mm/scale
+        corner_bot_NE[2] -= material_half_kerf_mm/scale
         list_ret.append( corner_bot_NE)
         # line segment3
         list_ret.append( corner_bot_NE[:])
