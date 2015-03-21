@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from ImportMesh import Part
 """
 this file is a part of pymoldmaker
 
@@ -16,20 +17,37 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
->>> import ImportMesh
->>> 'Mesh' in dir(ImportMesh)
-True
->>> 'Part' in dir(ImportMesh)
-True
->>> 'PartSection' in dir(ImportMesh)
-True
->>> 'VectorMesh' in dir(ImportMesh)
-True
 """
-from ImportMesh.Mesh import Mesh
-from ImportMesh.VectorMesh import VectorMesh
-from ImportMesh.Part import Part
-from ImportMesh.PartSection import PartSection
 
-__all__ = ["Mesh", "VectorMesh", "Part", "PartSection"]
+class PartSection:
+    """
+    object representing an individual cut piece for use in mold construction.
+
+    """
+
+    def __init__( self, material_dict=None):
+        """
+
+        >>> p = Part()
+        >>> p.material == None
+        True
+        >>> len(p.sections)
+        0
+        """
+        self.sections = []
+        self.material = material_dict
+
+    def addSections( self, part_sections):
+        """
+        
+        >>> p = Part()
+        >>> p.addSections([0,0,1])
+        >>> p.addSections([0,0,1])
+        >>> p.sections
+        [[0, 0, 1], [0, 0, 1]]
+        """
+        self.sections.append( part_sections)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
