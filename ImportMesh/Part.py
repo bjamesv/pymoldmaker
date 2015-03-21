@@ -41,16 +41,17 @@ class Part:
         self.sections = []
         self.material = material_dict
 
-    def addSections( self, part_sections):
+    def insertFrontSection( self, part_section):
         """
+        insert new PartSection into 0th index of the Part section list.        
         
         >>> p = Part()
-        >>> p.addSections([0,0,1])
-        >>> p.addSections([0,0,1])
+        >>> p.insertFrontSection([0,0,1])
+        >>> p.insertFrontSection([0,1,1])
         >>> p.sections
-        [[0, 0, 1], [0, 0, 1]]
+        [[0, 1, 1], [0, 0, 1]]
         """
-        self.sections.append( part_sections)
+        self.sections.insert(0, part_section)
 
 if __name__ == "__main__":
     import doctest

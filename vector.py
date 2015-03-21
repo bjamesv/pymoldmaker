@@ -31,7 +31,7 @@ if __name__ == '__main__':
     poly_line_xyz = list()
     s = mesh.bottomSections()
     for section in s:
-        for triplet in section:
+        for triplet in section.vertici:
             poly_line_xyz.extend( triplet)
     mesh.save_lines( file_new, poly_line_xyz)
     ## test exporting to EPS

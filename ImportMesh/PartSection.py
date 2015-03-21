@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from ImportMesh import Part
+from ImportMesh.Part import Part
 """
 this file is a part of pymoldmaker
 
@@ -28,25 +28,26 @@ class PartSection:
     def __init__( self, material_dict=None):
         """
 
-        >>> p = Part()
+        >>> p = PartSection()
         >>> p.material == None
         True
-        >>> len(p.sections)
+        >>> len(p.vertici)
         0
         """
-        self.sections = []
+        self.vertici = []
         self.material = material_dict
 
-    def addSections( self, part_sections):
+    def append( self, part_sections):
         """
+        append 'part_sections' list of COLLADA coord [x,y,z], to vertex list
         
-        >>> p = Part()
-        >>> p.addSections([0,0,1])
-        >>> p.addSections([0,0,1])
-        >>> p.sections
+        >>> p = PartSection()
+        >>> p.append([0,0,1])
+        >>> p.append([0,0,1])
+        >>> p.vertici
         [[0, 0, 1], [0, 0, 1]]
         """
-        self.sections.append( part_sections)
+        self.vertici.append( part_sections)
 
 if __name__ == "__main__":
     import doctest
