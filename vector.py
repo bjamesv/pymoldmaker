@@ -19,13 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from OutputVector import Canvas
 from ImportMesh import VectorMesh
-
+import argparse
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", help="file path to COLLADA input model"
+        , default='positive_for_mold.dae')
+    parser.add_argument("--thickness_mm", help="(optional) thickness of the \
+        material positive will be cut from.", type=int, default=6)
+    parser.add_argument("--out", help="file path to output"
+        , default='out.dae')
+    args = parser.parse_args()
+    input_file = args.input
     ## import a simple Sketchup COLLADA file
-    mesh = VectorMesh('positive_for_mold.dae')
+    mesh = VectorMesh( input_file)
+    ## set the thickness
+    mesh.material['thickness_mm'] = args.thickness_mm
     ## test a modification to the file & resave
-    file_new = 'cubeMOD.dae'
+    file_new = args.out
     # start a line from an arbitrary point - TODO: deprecated
     # poly_line_xyz = mesh.sections() # TODO: deprecated
     poly_line_xyz = list()
