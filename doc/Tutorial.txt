@@ -12,7 +12,7 @@ PyMoldmaker is a program designed to automatically generate woodworking "cut lis
 ##Step 1: Obtaining 3d model
 Obtain a 3d model in COLLADA (.dae) file format, representing the actual size of the item to be molded.
 
-![COLLADA model of part in SketchUp 2015](https://raw.githubusercontent.com/bjamesv/pymoldmaker/tree/master/doc/COLLADA.png)
+![COLLADA model of part in SketchUp 2015](https://raw.githubusercontent.com/bjamesv/pymoldmaker/master/doc/COLLADA.png)
 
 In my case, a model representing the desired object was created to mm scale in 'SketchUp 2015' using the Wine 1.7.34 Windows/Linux compatibility tool. The SketchUp model was then exported to a COLLADA file I named: `positive_for_mold.dae`
 
