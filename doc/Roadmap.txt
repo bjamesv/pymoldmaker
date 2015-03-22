@@ -1,0 +1,9 @@
+#Roadmap
+PyMoldmaker is being incrementally developed in several small phases.
+ - [x] Phase 0 - generate cutlist for one portion of the mold
+  - [x] support arbitrary material thicknesses
+  - [x] account for kerf of cutting tool in cutlist output
+ - [ ] Phase 1 - flexible Cutlist output formats (Human readable, COLLADA, etc.)
+  - [ ] confirm parts cut from Phase-0 output match expected dimensions
+ - [ ] Phase 2 - automatic generation of all parts
+ - [ ] Phase 3 - automatic EPS output
