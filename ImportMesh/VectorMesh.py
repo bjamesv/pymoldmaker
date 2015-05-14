@@ -42,6 +42,8 @@ class VectorMesh ( Mesh ):
     depth_xy_corner_cut = 11. #TODO: lookup/detect actual depth
     """ depth in mm of the 45deg corner cuts that bisect the XY plane of the 
         flat positive being molded"""
+    
+    scale_collada = 25.38 # TODO: is this correct? ..how is 4.23 * 6 units per derived?
 
     def isCompleteBottom(self):
         """ returns True if bottom_parts has been fully populated """
@@ -76,13 +78,13 @@ class VectorMesh ( Mesh ):
         section = PartSection()
         material_thickness_mm = self.material['thickness_mm']
         material_half_kerf_mm = 0.5 * self.material['kerf_mm']
-        scale = 25.38 # TODO: is this correct? ..how is 4.23 * 6 units per derived?
         sections_needed = self.sectionsNeededToCompleteXyPlaneCut()
         part_thickness_mm = sections_needed*material_thickness_mm
         # define a rectangle for the left side
         corner_top_NW = self.get_corner( [-1,1,1])
         corner_bot_NW = self.get_corner( [-1,1,-1])
         # (shrink from the west side, to make room for the part on that side.)
+        scale = self.scale_collada
         corner_top_NW[1] -= part_thickness_mm/scale
         corner_bot_NW[1] -= part_thickness_mm/scale
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
@@ -94,6 +96,9 @@ class VectorMesh ( Mesh ):
         corner_bot_NW[2] -= material_half_kerf_mm/scale
         section.append( corner_top_NW)
         section.append( corner_bot_NW)
+        # compute final height of west edge
+        length_west_edge = self.get_mm_dist( corner_bot_NW, corner_top_NW)
+
         # line segment2
         section.append( corner_bot_NW[:]) #make copies of vertici already used
         # (also, translate the east side in, to make room for that side's part)
@@ -107,7 +112,12 @@ class VectorMesh ( Mesh ):
         # (again, make part taller to account for the cut's 1/2 kerf width)
         corner_top_NE[2] += material_half_kerf_mm/scale
         corner_bot_NE[2] -= material_half_kerf_mm/scale
-        section.append( corner_bot_NE)
+        section.append( corner_bot_NE )
+        # compute final length of north edge
+        length_north_edge = self.get_mm_dist( corner_bot_NW, corner_bot_NE) 
+        # save human-readable dimensions of the part section
+        section.dimensions_mm = ( length_west_edge,length_north_edge)
+
         # line segment3
         section.append( corner_bot_NE[:])
         section.append( corner_top_NE)
@@ -120,9 +130,37 @@ class VectorMesh ( Mesh ):
         while not self.isCompleteXyPlane( bottom_part.sections):
             # clone the xyz coords from the section we just created, into a new list
             section_new = PartSection()
+            section_new.dimensions_mm = bottom_part.sections[0].dimensions_mm
             section_new.vertici = deepcopy(bottom_part.sections[0].vertici)
             # now shift the set of lines material_thickness_mm to the Right
             for vert in section_new.vertici:
                 vert[0] += (material_thickness_mm/scale)
             bottom_part.insertFrontSection( section_new)
         return bottom_part.sections
+
+    def get_collada_unit_dist( self, list_coord_tuple1, list_coord_tuple2):
+        """
+        Computes distance between two 3d coords, measured in cartesian units
+
+        e.g., distance between origin and the unit vector (1,0,0) is: 1 "unit"
+        long
+        >>> VectorMesh('test/cube.dae').get_collada_unit_dist( [1,0,0], [0,0,0])
+        1.0
+        """
+        from scipy.spatial.distance import euclidean
+        return euclidean( list_coord_tuple1, list_coord_tuple2)
+
+    def get_mm_dist( self, list_coord_tuple1, list_coord_tuple2):
+        """
+        Computes distance between two 3d coords, measured in millimeters.
+
+        (coordinate units are converted to mm using our hardcoded scale factor.
+        If we were really diligent, we could probably find the XML element from
+        the loaded COLLADA file that defines the per-file scale.)
+        >>> d = VectorMesh('test/cube.dae').get_mm_dist( [120/(4.23*6),0,0], [0,0,0])
+        >>> round( d, 4)
+        120.0
+        """
+        scale = self.scale_collada
+        length_collada_unit = self.get_collada_unit_dist( list_coord_tuple1, list_coord_tuple2)
+        return length_collada_unit*scale

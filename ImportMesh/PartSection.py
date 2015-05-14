@@ -36,8 +36,11 @@ class PartSection:
         """
         self.vertici = []
         self.material = material_dict
+        self.single_plane = None
+        self.dimensions_mm = None
+        #False if not all vertex lie on a common plane
 
-    def append( self, part_sections):
+    def append( self, *part_sections):
         """
         append 'part_sections' list of COLLADA coord [x,y,z], to vertex list
         
@@ -47,7 +50,8 @@ class PartSection:
         >>> p.vertici
         [[0, 0, 1], [0, 0, 1]]
         """
-        self.vertici.append( part_sections)
+        for coord in part_sections:
+            self.vertici.append( coord)
 
 if __name__ == "__main__":
     import doctest
