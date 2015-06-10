@@ -48,9 +48,12 @@ class VectorMesh ( Mesh ):
     def save(self, file_path):
         """ save mesh and supplemental PartSections out to a COLLADA file.
         """
+        print ("# Cutlist")
         # convert mold-making PartSections into list of 3d-coord pairs("lines")
         list_poly_line_xyz = list()
+        print ("## Bottom Part")
         for partSection in self.bottomSections():
+            print (" * {} section".format(partSection))
             for triplet in partSection.vertici:
                 list_poly_line_xyz.extend( triplet)
         # save original mesh+ these lines
@@ -87,7 +90,7 @@ class VectorMesh ( Mesh ):
         ##TODO: provide prototype implementation for the model slicing function
         """
         bottom_part = Part()
-        section = PartSection()
+        list_section_poly_outline = []
         material_thickness_mm = self.material['thickness_mm']
         material_half_kerf_mm = 0.5 * self.material['kerf_mm']
         sections_needed = self.sectionsNeededToCompleteXyPlaneCut()
@@ -106,13 +109,13 @@ class VectorMesh ( Mesh ):
         # (and make part taller, also to account for 1/2 kerf width)
         corner_top_NW[2] += material_half_kerf_mm/scale
         corner_bot_NW[2] -= material_half_kerf_mm/scale
-        section.append( corner_top_NW)
-        section.append( corner_bot_NW)
-        # compute final height of west edge
+        list_section_poly_outline.append( corner_top_NW)
+        list_section_poly_outline.append( corner_bot_NW)
+        # compute final height of west edge #TODO:refactor this into PartSection
         length_west_edge = self.get_mm_dist( corner_bot_NW, corner_top_NW)
 
         # line segment2
-        section.append( corner_bot_NW[:]) #make copies of vertici already used
+        #TODO: Refactor into PartSection#section.append( corner_bot_NW[:]) #make copies of vertici already used
         # (also, translate the east side in, to make room for that side's part)
         corner_bot_NE = self.get_corner( [-1,-1,-1])
         corner_top_NE = self.get_corner( [-1,-1,1])
@@ -124,26 +127,27 @@ class VectorMesh ( Mesh ):
         # (again, make part taller to account for the cut's 1/2 kerf width)
         corner_top_NE[2] += material_half_kerf_mm/scale
         corner_bot_NE[2] -= material_half_kerf_mm/scale
-        section.append( corner_bot_NE )
+        list_section_poly_outline.append( corner_bot_NE )
         # compute final length of north edge
         length_north_edge = self.get_mm_dist( corner_bot_NW, corner_bot_NE) 
         # save human-readable dimensions of the part section
-        section.dimensions_mm = ( length_west_edge,length_north_edge)
+        set_dimensions_mm_tuple = ( length_west_edge,length_north_edge)
 
         # line segment3
-        section.append( corner_bot_NE[:])
-        section.append( corner_top_NE)
+        #TODO: Refactor into PartSection#section.append( corner_bot_NE[:])
+        list_section_poly_outline.append( corner_top_NE)
         # line segment4
-        section.append( corner_top_NE[:])
-        section.append( corner_top_NW[:])
+        #TODO: Refactor into PartSection#section.append( corner_top_NE[:])
+        #TODO: Refactor into PartSection#section.append( corner_top_NW[:])
         # add verts to the list of sections to be cut
+        section = PartSection(list_section_poly_outline, set_dimensions_mm_tuple)
         bottom_part.insertFrontSection( section)
         # build additional sections, until the list is thick enough
         while not self.isCompleteXyPlane( bottom_part.sections):
             # clone the xyz coords from the section we just created, into a new list
-            section_new = PartSection()
-            section_new.dimensions_mm = bottom_part.sections[0].dimensions_mm
-            section_new.vertici = deepcopy(bottom_part.sections[0].vertici)
+            set_dimensions_mm_new = deepcopy(bottom_part.sections[0].dimensions_mm)
+            list_vertici_new = deepcopy(bottom_part.sections[0].vertici)
+            section_new = PartSection(list_vertici_new, set_dimensions_mm_new)
             # now shift the set of lines material_thickness_mm to the Right
             for vert in section_new.vertici:
                 vert[0] += (material_thickness_mm/scale)

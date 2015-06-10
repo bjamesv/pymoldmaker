@@ -25,33 +25,51 @@ class PartSection:
 
     """
 
-    def __init__( self, material_dict=None):
+    def __init__( self, list_vertex, set_dimension_mm_tuple, material_dict=None):
         """
+        create a new PartSection
 
-        >>> p = PartSection()
+        Keyword arguments:
+        list_vertex -- collection of [x,y,z] coordinates representing a
+            polygonal line.
+        material_dict -- collection of material properties
+
+        >>> l = [[0,0,0],[0,1,0,],[1,1,0],[1,0,0]]
+        >>> p = PartSection(l,())
         >>> p.material == None
         True
         >>> len(p.vertici)
-        0
-        """
-        self.vertici = []
-        self.material = material_dict
-        self.single_plane = None
-        self.dimensions_mm = None
-        #False if not all vertex lie on a common plane
-
-    def append( self, *part_sections):
-        """
-        append 'part_sections' list of COLLADA coord [x,y,z], to vertex list
-        
-        >>> p = PartSection()
-        >>> p.append([0,0,1])
-        >>> p.append([0,0,1])
+        8
+        >>> l = [[0,0,1]]
+        >>> p = PartSection( l, ())
         >>> p.vertici
         [[0, 0, 1], [0, 0, 1]]
         """
-        for coord in part_sections:
-            self.vertici.append( coord)
+        self.vertici = []
+        self.material = material_dict
+        self.dimensions_mm = set_dimension_mm_tuple
+        # convert the list of poly vertici, into pairs of vertici representing
+        # line segments
+        for i, coord in enumerate(list_vertex):
+            list_next_coord = None
+            #line segment termintates at the next coord (unless end
+            # has been reached, then next coord is the first one provided )
+            if i >= len(list_vertex)-2:
+                list_next_coord = list_vertex[0]
+            else:
+                list_next_coord = list_vertex[i+1]
+            self.vertici.append(coord[:])
+            self.vertici.append(list_next_coord[:])
+
+    def __str__( self):
+        """ returns a simple human-readable representation of this PartSection.
+
+        >>> l = [[0,0,1],[0,0,1]]
+        >>> p = PartSection( l, (0,0))
+        >>> str(p)
+        '(0.00 mm, 0.00 mm)'
+        """
+        return '({0:.2f} mm, {0:.2f} mm)'.format(self.dimensions_mm[0], self.dimensions_mm[1])
 
 if __name__ == "__main__":
     import doctest
