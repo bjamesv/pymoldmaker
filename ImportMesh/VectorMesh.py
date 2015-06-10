@@ -45,6 +45,18 @@ class VectorMesh ( Mesh ):
     
     scale_collada = 25.38 # TODO: is this correct? ..how is 4.23 * 6 units per derived?
 
+    def save(self, file_path):
+        """ save mesh and supplemental PartSections out to a COLLADA file.
+        """
+        # convert mold-making PartSections into list of 3d-coord pairs("lines")
+        list_poly_line_xyz = list()
+        for partSection in self.bottomSections():
+            for triplet in partSection.vertici:
+                list_poly_line_xyz.extend( triplet)
+        # save original mesh+ these lines
+        self.save_lines( file_path, list_poly_line_xyz)
+        return
+
     def isCompleteBottom(self):
         """ returns True if bottom_parts has been fully populated """
         return self.isCompleteXyPlane(self.bottom_parts)

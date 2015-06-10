@@ -37,14 +37,7 @@ if __name__ == '__main__':
     mesh.material['thickness_mm'] = args.thickness_mm
     ## test a modification to the file & resave
     file_new = args.out
-    # start a line from an arbitrary point - TODO: deprecated
-    # poly_line_xyz = mesh.sections() # TODO: deprecated
-    poly_line_xyz = list()
-    s = mesh.bottomSections()
-    for section in s:
-        for triplet in section.vertici:
-            poly_line_xyz.extend( triplet)
-    mesh.save_lines( file_new, poly_line_xyz)
+    mesh.save( file_new)
     ## test exporting to EPS
     img = Canvas()
     poly_line_mm = (  (80,80),(320,80)
