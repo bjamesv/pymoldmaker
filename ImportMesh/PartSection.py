@@ -44,8 +44,20 @@ class PartSection:
         >>> p = PartSection( l, ())
         >>> p.vertici
         [[0, 0, 1], [0, 0, 1]]
+        >>> l = [[0,0,1],[0,0,3]]
+        >>> p = PartSection( l, ())
+        >>> p.vertici
+        [[0, 0, 1], [0, 0, 3], [0, 0, 3], [0, 0, 1]]
         """
         self.vertici = []
+        """
+        endpoint YXZ coords, of all line segments which compose the PartSection
+
+        (A PartSection is represented by a collection of line segments which
+        together form the outline of the 2d section. All pairs of YXZ coord
+        endpoints are concatenated together in this attribute.
+        """
+
         self.material = material_dict
         self.dimensions_mm = set_dimension_mm_tuple
         # convert the list of poly vertici, into pairs of vertici representing
@@ -54,7 +66,7 @@ class PartSection:
             list_next_coord = None
             #line segment termintates at the next coord (unless end
             # has been reached, then next coord is the first one provided )
-            if i >= len(list_vertex)-2:
+            if i >= len(list_vertex)-1:
                 list_next_coord = list_vertex[0]
             else:
                 list_next_coord = list_vertex[i+1]
