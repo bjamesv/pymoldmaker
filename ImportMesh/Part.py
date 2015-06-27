@@ -53,6 +53,24 @@ class Part:
         """
         self.sections.insert(0, part_section)
 
+    def getAsLineSegments( self):
+        """
+        returns a list of XYZ coord pairs, representing the part.
+
+        >>> p = Part()
+        >>> from ImportMesh import PartSection
+        >>> l1 = [[0,0,0],[0,0,1]]
+        >>> l2 = [[0,4,0],[0,4,1]]
+        >>> p.insertFrontSection(PartSection(l1,(1,0)))
+        >>> p.insertFrontSection(PartSection(l2,(1,0)))
+        >>> p.getAsLineSegments()
+        [[0, 4, 0], [0, 4, 1], [0, 4, 1], [0, 4, 0], [0, 0, 0], [0, 0, 1], [0, 0, 1], [0, 0, 0]]
+        """
+        listReturn = list()
+        for section in self.sections:
+            listReturn.extend( section.vertici[:])
+        return listReturn
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

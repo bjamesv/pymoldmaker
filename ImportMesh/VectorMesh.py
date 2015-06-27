@@ -48,16 +48,17 @@ class VectorMesh ( Mesh ):
     def save(self, file_path):
         """ save mesh and supplemental PartSections out to a COLLADA file.
         """
+        # print human-readable cutlist
         print ("# Cutlist")
-        # convert mold-making PartSections into list of 3d-coord pairs("lines")
-        list_poly_line_xyz = list()
         print ("## Bottom Part")
         for partSection in self.bottomSections():
             print (" * {} section".format(partSection))
-            for triplet in partSection.vertici:
-                list_poly_line_xyz.extend( triplet)
+        # overlay a visualization of the parts onto original COLLADA model
+        # convert mold-making PartSections into list of 3d-coord pairs("lines")
+        list_line_segment_endpoints_xyz = list()
+        list_line_segment_endpoints_xyz = self.bottomPart().getAsLineSegments()
         # save original mesh+ these lines
-        self.save_lines( file_path, list_poly_line_xyz)
+        self.save_lines( file_path, list_line_segment_endpoints_xyz)
         return
 
     def isCompleteBottom(self):
@@ -85,9 +86,14 @@ class VectorMesh ( Mesh ):
     def bottomSections(self):
         """
         Returns a list of vertex coodinates of the form [ x1, y1,z1, x2, y2, z2
-        , ...] representing a set of line segments, defining the geometry of a 
-        slice of final plaster mould blank.
-        ##TODO: provide prototype implementation for the model slicing function
+        , ...] representing a set of line segments, defining the geometry of
+        the plaster molding blank's bottom section.
+        """
+        return self.bottomPart().sections
+
+    def bottomPart(self):
+        """
+        Returns a Part representing the bottom edge of the mold making positive
         """
         bottom_part = Part()
         list_section_poly_outline = []
@@ -152,7 +158,7 @@ class VectorMesh ( Mesh ):
             for vert in section_new.vertici:
                 vert[0] += (material_thickness_mm/scale)
             bottom_part.insertFrontSection( section_new)
-        return bottom_part.sections
+        return bottom_part
 
     def get_collada_unit_dist( self, list_coord_tuple1, list_coord_tuple2):
         """
