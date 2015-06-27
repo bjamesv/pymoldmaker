@@ -68,8 +68,11 @@ class PartSection:
         >>> p = PartSection( l, (0,0))
         >>> str(p)
         '(0.00 mm, 0.00 mm)'
+        >>> p = PartSection( l, (0,9)) #Constructor trusts coords match mm_dim
+        >>> str(p)
+        '(0.00 mm, 9.00 mm)'
         """
-        return '({0:.2f} mm, {0:.2f} mm)'.format(self.dimensions_mm[0], self.dimensions_mm[1])
+        return '({0:.2f} mm, {1:.2f} mm)'.format(self.dimensions_mm[0], self.dimensions_mm[1])
 
 if __name__ == "__main__":
     import doctest
