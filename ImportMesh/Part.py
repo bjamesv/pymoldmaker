@@ -39,7 +39,15 @@ class Part:
         0
         """
         self.sections = []
-        self.material = material_dict
+        """list of vertex coodinates of the form [ x1, y1,z1, x2, y2, z2
+        , ...] representing a set of line segments, defining the geometry of
+        the plaster molding blank's bottom section.
+        """
+        self.material = material_dict 
+
+    
+    def __getitem__(self, key):
+        return self.sections[key]
 
     def insertFrontSection( self, part_section):
         """

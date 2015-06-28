@@ -48,18 +48,40 @@ class VectorMesh ( Mesh ):
     def save(self, file_path):
         """ save mesh and supplemental PartSections out to a COLLADA file.
         """
-        # print human-readable cutlist
-        print ("# Cutlist")
-        print ("## Bottom Part")
-        for partSection in self.bottomSections():
-            print (" * {} section".format(partSection))
-        # overlay a visualization of the parts onto original COLLADA model
+        # get Parts (... and their component PartSections)
+        dictParts = self.generateParts()
+
         # convert mold-making PartSections into list of 3d-coord pairs("lines")
         list_line_segment_endpoints_xyz = list()
-        list_line_segment_endpoints_xyz = self.bottomPart().getAsLineSegments()
-        # save original mesh+ these lines
+        # ..and while we convert, also print human-readable cutlist
+        print ("# Cutlist")
+        for keyPartName in dictParts.keys():
+            part = dictParts[keyPartName] #get part, print its name        
+            print ("## {} Part".format(keyPartName))
+            for partSection in part: #print its component PartSections
+                print (" * {} section".format(partSection))
+            #collect the line segment endpoints, for this Part's sections
+            list_line_segment_endpoints_xyz = part.getAsLineSegments()
+
+        # overlay a visualization of this part, onto original COLLADA model,and
+        # save original mesh+ these lines to the specified file
         self.save_lines( file_path, list_line_segment_endpoints_xyz)
         return
+
+    def generateParts(self):
+        """
+        generates the inventory of Parts needed to assemble the mold positive.
+
+        Returns: Dict of Parts needed,indexed by human-readable part name
+        """
+        ## generation strategy: start by determining size of bottom edge,then
+        # side edges. Then, assuming the mold positive needs an exhaust on the
+        # top edge, determine sizes for the three parts for the top edge.
+        # Finally calculate dimensions of the mold positive's top face.
+        dictParts = {'Bottom': self.bottomPart()}
+
+        #TODO: generate side edges,top edge, and top face.
+        return dictParts
 
     def isCompleteBottom(self):
         """ returns True if bottom_parts has been fully populated """
@@ -80,16 +102,7 @@ class VectorMesh ( Mesh ):
         are needed to make one of the 45deg corner cuts, that bisect the XY 
         plane of the flat positive being molded """
         sections = self.depth_xy_corner_cut/self.material['thickness_mm']
-        return math.ceil( sections) # whole sections required 
-
-    
-    def bottomSections(self):
-        """
-        Returns a list of vertex coodinates of the form [ x1, y1,z1, x2, y2, z2
-        , ...] representing a set of line segments, defining the geometry of
-        the plaster molding blank's bottom section.
-        """
-        return self.bottomPart().sections
+        return math.ceil( sections) # whole sections required
 
     def bottomPart(self):
         """
@@ -121,7 +134,7 @@ class VectorMesh ( Mesh ):
         length_west_edge = self.get_mm_dist( corner_bot_NW, corner_top_NW)
 
         # line segment2
-        #TODO: Refactor into PartSection#section.append( corner_bot_NW[:]) #make copies of vertici already used
+        #make copies of vertici already used
         # (also, translate the east side in, to make room for that side's part)
         corner_bot_NE = self.get_corner( [-1,-1,-1])
         corner_top_NE = self.get_corner( [-1,-1,1])
@@ -140,11 +153,8 @@ class VectorMesh ( Mesh ):
         set_dimensions_mm_tuple = ( length_west_edge,length_north_edge)
 
         # line segment3
-        #TODO: Refactor into PartSection#section.append( corner_bot_NE[:])
         list_section_poly_outline.append( corner_top_NE)
         # line segment4
-        #TODO: Refactor into PartSection#section.append( corner_top_NE[:])
-        #TODO: Refactor into PartSection#section.append( corner_top_NW[:])
         # add verts to the list of sections to be cut
         section = PartSection(list_section_poly_outline, set_dimensions_mm_tuple)
         bottom_part.insertFrontSection( section)
