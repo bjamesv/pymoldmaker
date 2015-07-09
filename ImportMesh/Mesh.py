@@ -30,7 +30,7 @@ from collada.geometry import Geometry
 from collada.scene import MaterialNode
 from collada.scene import GeometryNode
 from collada.scene import Node
-from collada.scene import Scene
+from collada.scene import Scene, MatrixTransform
 
 class Mesh:
     def __init__(self, file_path):
@@ -49,6 +49,16 @@ class Mesh:
         pycollada.github.io/reference/generated/collada.scene.Scene.html
         """
         return self.mesh.scene
+
+    def getFirstTransformOfFirstScene(self):
+        """ returns 4x4 numpy array,representing transform of first scene
+        """
+        geometry_node_of_scene = self.visual_scene().nodes[0].children[0]
+        if type(geometry_node_of_scene) == 'Node':
+            return geometry_node_of_scene.transforms[0]
+        #else, no transform: generate an Identity MatrixTransform
+        matrix_4x4 = numpy.identity(4)
+        return MatrixTransform(numpy.ravel( matrix_4x4))
         
     def primitives(self):
         """ returns a list of primitive sets specified in the <geometry/>

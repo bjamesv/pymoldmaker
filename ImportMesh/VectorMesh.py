@@ -23,6 +23,7 @@ from ImportMesh.Part import Part
 from ImportMesh.PartSection import PartSection
 from copy import deepcopy
 import math
+import numpy
 
 class VectorMesh ( Mesh ):
     # object representing COLLADA mesh of a positive for mold-making, 
@@ -107,11 +108,92 @@ class VectorMesh ( Mesh ):
     def bottomPart(self):
         """
         Returns a Part representing the bottom edge of the mold making positive
+
+        >>> vect = VectorMesh( 'test/cube_flipped.dae')
+        >>> part = vect.bottomPart()
+        >>> len(part.sections)
+        2
+        >>> part[0].dimensions_mm
+        (112.5, 240) 
         """
+        #TODO: unit test returned Part (21.95 mm, 363.10 mm) for positive
         bottom_part = Part()
         list_section_poly_outline = []
         material_thickness_mm = self.material['thickness_mm']
         material_half_kerf_mm = 0.5 * self.material['kerf_mm']
+        sections_needed = self.sectionsNeededToCompleteXyPlaneCut()
+        part_thickness_mm = sections_needed*material_thickness_mm
+        # define a rectangle for the left side
+        corner_top_NW = self.get_corner( [-1,1,1])
+        corner_bot_NW = self.get_corner( [-1,1,-1])
+        # (shrink from the west side, to make room for the part on that side.)
+        scale = self.scale_collada
+        corner_top_NW[1] -= part_thickness_mm/scale
+        corner_bot_NW[1] -= part_thickness_mm/scale
+        ''' adjust for half of the cutting tool's kerf (other half of kerf lies
+            outside our cut line & for the part dimensions can be ignored)'''
+        corner_top_NW[1] += material_half_kerf_mm/scale
+        corner_bot_NW[1] += material_half_kerf_mm/scale
+        # (and make part taller, also to account for 1/2 kerf width)
+        corner_top_NW[2] += material_half_kerf_mm/scale
+        corner_bot_NW[2] -= material_half_kerf_mm/scale
+        list_section_poly_outline.append( corner_top_NW)
+        list_section_poly_outline.append( corner_bot_NW)
+        # compute final height of west edge #TODO:refactor this into PartSection
+        length_west_edge = self.get_mm_dist( corner_bot_NW, corner_top_NW)
+
+        # line segment2
+        #make copies of vertici already used
+        # (also, translate the east side in, to make room for that side's part)
+        corner_bot_NE = self.get_corner( [-1,-1,-1])
+        corner_top_NE = self.get_corner( [-1,-1,1])
+        corner_bot_NE[1] += part_thickness_mm/scale
+        corner_top_NE[1] += part_thickness_mm/scale
+        # adjust for 1/2 of the cutting tool's kerf width
+        corner_bot_NE[1] -= material_half_kerf_mm/scale
+        corner_top_NE[1] -= material_half_kerf_mm/scale
+        # (again, make part taller to account for the cut's 1/2 kerf width)
+        corner_top_NE[2] += material_half_kerf_mm/scale
+        corner_bot_NE[2] -= material_half_kerf_mm/scale
+        list_section_poly_outline.append( corner_bot_NE )
+        # compute final length of north edge
+        length_north_edge = self.get_mm_dist( corner_bot_NW, corner_bot_NE) 
+        # save human-readable dimensions of the part section
+        set_dimensions_mm_tuple = ( length_west_edge,length_north_edge)
+
+        # line segment3
+        list_section_poly_outline.append( corner_top_NE)
+        # line segment4
+        # add verts to the list of sections to be cut
+        section = PartSection(list_section_poly_outline, set_dimensions_mm_tuple)
+        bottom_part.insertFrontSection( section)
+        # build additional sections, until the list is thick enough
+        while not self.isCompleteXyPlane( bottom_part.sections):
+            # clone the xyz coords from the section we just created, into a new list
+            set_dimensions_mm_new = deepcopy(bottom_part.sections[0].dimensions_mm)
+            list_vertici_new = deepcopy(bottom_part.sections[0].vertici)
+            section_new = PartSection(list_vertici_new, set_dimensions_mm_new)
+            # now shift the set of lines material_thickness_mm to the Right
+            for vert in section_new.vertici:
+                vert[0] += (material_thickness_mm/scale)
+            bottom_part.insertFrontSection( section_new)
+        return bottom_part
+
+    def getMaterialHalfKerf(self):
+        """
+        Returns a fr
+        """
+        return 0.5 * self.material['kerf_mm']
+
+    def sidePart(self):
+        """
+        Returns a Part representing one of the two edges of molding positive
+        """
+        partSide = Part()
+        # part is built up from one or more layers laminated together.
+        listPolyOutline = [] # polygon, outlining the first layer of the part
+        material_thickness_mm = self.material['thickness_mm']
+        material_half_kerf_mm = self.getMaterialHalfKerf()
         sections_needed = self.sectionsNeededToCompleteXyPlaneCut()
         part_thickness_mm = sections_needed*material_thickness_mm
         # define a rectangle for the left side
@@ -194,5 +276,16 @@ class VectorMesh ( Mesh ):
         120.0
         """
         scale = self.scale_collada
-        length_collada_unit = self.get_collada_unit_dist( list_coord_tuple1, list_coord_tuple2)
-        return length_collada_unit*scale
+        #TODO: obtain real unit to cm scale
+        ratio_mm_per_unit = 0.0254 * 25.4#inch per unit * mm per inch
+        #TODO: obtain real scaling transform
+        scale = self.getFirstTransformOfFirstScene().matrix
+
+        list_coord_tuple1_4x1 = list_coord_tuple1[:]
+        list_coord_tuple1_4x1.append(1)
+        coord1 = scale.dot( list_coord_tuple1_4x1)
+        list_coord_tuple2_4x1 = list_coord_tuple2[:]
+        list_coord_tuple2_4x1.append(1)
+        coord2 = scale.dot(list_coord_tuple2_4x1)
+        length_collada_unit = self.get_collada_unit_dist( coord1, coord2)
+        return length_collada_unit*ratio_mm_per_unit
