@@ -109,14 +109,13 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing the bottom edge of the mold making positive
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae')
+        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> part = vect.bottomPart()
         >>> len(part.sections)
         2
-        >>> part[0].dimensions_mm
-        (112.5, 240) 
+        >>> part[0].dimensions_mm #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-2*6)
+        (112.5, 248) 
         """
-        #TODO: unit test returned Part (21.95 mm, 363.10 mm) for positive
         bottom_part = Part()
         list_section_poly_outline = []
         material_thickness_mm = self.material['thickness_mm']
@@ -264,6 +263,21 @@ class VectorMesh ( Mesh ):
         from scipy.spatial.distance import euclidean
         return euclidean( list_coord_tuple1, list_coord_tuple2)
 
+    def get_unit_dist( self, mm_dist, list_coord_unit_vector):
+        """
+        Converts a distance in mm along a specific vector, into Collada units.
+
+        >>> d = VectorMesh('test/cube_flipped.dae').get_unit_dist( 20, [1,0,0])
+        >>> round( d, 4)
+        22.8782
+        """
+        dist_vector = numpy.array(list_coord_unit_vector).dot( mm_dist)
+        dist_vector_4x1 = dist_vector.tolist()[:]
+        dist_vector_4x1.append( 1)#extend to 4x1, for scaling
+        scale = self.getFirstTransformOfFirstScene().matrix
+        dist_vector_scaled = scale.dot(dist_vector_4x1)[0:3]
+        return self.get_collada_unit_dist( [0,0,0], dist_vector_scaled)
+
     def get_mm_dist( self, list_coord_tuple1, list_coord_tuple2):
         """
         Computes distance between two 3d coords, measured in millimeters.
@@ -275,9 +289,10 @@ class VectorMesh ( Mesh ):
         >>> round( d, 4)
         120.0
         """
-        scale = self.scale_collada
+        scaleO = self.scale_collada#TODO: remove debug
+        length_collada_unitO = self.get_collada_unit_dist( list_coord_tuple1, list_coord_tuple2)
         #TODO: obtain real unit to cm scale
-        ratio_mm_per_unit = 0.0254 * 25.4#inch per unit * mm per inch
+        ratio_mm_per_unit = 0.0254 * (1/25.4)#unit per inch * inch per mm
         #TODO: obtain real scaling transform
         scale = self.getFirstTransformOfFirstScene().matrix
 
@@ -287,5 +302,5 @@ class VectorMesh ( Mesh ):
         list_coord_tuple2_4x1 = list_coord_tuple2[:]
         list_coord_tuple2_4x1.append(1)
         coord2 = scale.dot(list_coord_tuple2_4x1)
-        length_collada_unit = self.get_collada_unit_dist( coord1, coord2)
-        return length_collada_unit*ratio_mm_per_unit
+        length_collada_unit = self.get_collada_unit_dist( coord1[0:3], coord2[0:3])
+        return length_collada_unit*scaleO #ratio_mm_per_unit

@@ -52,9 +52,24 @@ class Mesh:
 
     def getFirstTransformOfFirstScene(self):
         """ returns 4x4 numpy array,representing transform of first scene
+
+        >>> t = Mesh('test/cube.dae').getFirstTransformOfFirstScene()
+        >>> t.matrix
+        array([[ 1.,  0.,  0.,  0.],
+               [ 0.,  1.,  0.,  0.],
+               [ 0.,  0.,  1.,  0.],
+               [ 0.,  0.,  0.,  1.]])
+        >>> import numpy as np
+        >>> np.set_printoptions(6)
+        >>> t = Mesh('test/cube_flipped.dae').getFirstTransformOfFirstScene()
+        >>> t.matrix
+        array([[  1.000000e+00,   0.000000e+00,   0.000000e+00,  -4.373134e-01],
+               [  0.000000e+00,  -1.000000e+00,  -8.187895e-16,  -1.090898e+01],
+               [  0.000000e+00,   8.187895e-16,  -1.000000e+00,   4.659263e+00],
+               [  0.000000e+00,   0.000000e+00,   0.000000e+00,   1.000000e+00]], dtype=float32)
         """
         geometry_node_of_scene = self.visual_scene().nodes[0].children[0]
-        if type(geometry_node_of_scene) == 'Node':
+        if isinstance(geometry_node_of_scene, Node):
             return geometry_node_of_scene.transforms[0]
         #else, no transform: generate an Identity MatrixTransform
         matrix_4x4 = numpy.identity(4)
