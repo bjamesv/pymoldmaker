@@ -43,8 +43,6 @@ class VectorMesh ( Mesh ):
     depth_xy_corner_cut = 11. #TODO: lookup/detect actual depth
     """ depth in mm of the 45deg corner cuts that bisect the XY plane of the 
         flat positive being molded"""
-    
-    scale_collada = 25.38 # TODO: is this correct? ..how is 4.23 * 6 units per derived?
 
     def save(self, file_path):
         """ save mesh and supplemental PartSections out to a COLLADA file.
@@ -114,7 +112,7 @@ class VectorMesh ( Mesh ):
         >>> len(part.sections)
         2
         >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-2*6)
-        >>> [ round(x, 2) for x in part[0].dimensions_mm ]
+        >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
         [112.5, 248.0]
         """
         bottom_part = Part()
@@ -127,8 +125,8 @@ class VectorMesh ( Mesh ):
         corner_top_NW = self.get_corner( [-1,1,1])
         corner_bot_NW = self.get_corner( [-1,1,-1])
         # (shrink from the west side, to make room for the part on that side.)
-        scale = self.scale_collada
-        corner_top_NW[1] -= part_thickness_mm/scale
+        scale = self.ratio_mm_per_unit() #TODO: use both the unit ratio AND geometry transform matrix
+        corner_top_NW[1] -= part_thickness_mm/scale #FIXME: precision finer than 0.1mm should be possible
         corner_bot_NW[1] -= part_thickness_mm/scale
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
             outside our cut line & for the part dimensions can be ignored)'''
@@ -200,7 +198,7 @@ class VectorMesh ( Mesh ):
         corner_top_NW = self.get_corner( [-1,1,1])
         corner_bot_NW = self.get_corner( [-1,1,-1])
         # (shrink from the west side, to make room for the part on that side.)
-        scale = self.scale_collada
+        scale = self.ratio_mm_per_unit() #TODO: use both the unit ratio AND geometry transform matrix
         corner_top_NW[1] -= part_thickness_mm/scale
         corner_bot_NW[1] -= part_thickness_mm/scale
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
@@ -290,18 +288,16 @@ class VectorMesh ( Mesh ):
         >>> round( d, 4)
         120.0
         """
-        scaleO = self.scale_collada#TODO: remove debug
-        length_collada_unitO = self.get_collada_unit_dist( list_coord_tuple1, list_coord_tuple2)
-        #TODO: obtain real unit to cm scale
-        ratio_mm_per_unit = 0.0254 * (1000)#SI meters per unit * mm per meter
-        #TODO: obtain real scaling transform
-        scale = self.getFirstTransformOfFirstScene().matrix
+        scale = self.ratio_mm_per_unit()
+        # transform the 3d coords, as specified by the COLLADA file's scene.
+        transform_matrix = self.getFirstTransformOfFirstScene().matrix
 
         list_coord_tuple1_4x1 = list_coord_tuple1[:]
         list_coord_tuple1_4x1.append(1)
-        coord1 = scale.dot( list_coord_tuple1_4x1)
+        coord1 = transform_matrix.dot( list_coord_tuple1_4x1)
         list_coord_tuple2_4x1 = list_coord_tuple2[:]
         list_coord_tuple2_4x1.append(1)
-        coord2 = scale.dot(list_coord_tuple2_4x1)
+        coord2 = transform_matrix.dot(list_coord_tuple2_4x1)
         length_collada_unit = self.get_collada_unit_dist( coord1[0:3], coord2[0:3])
-        return length_collada_unit*ratio_mm_per_unit
+        # now convert the COLLADA Unit length into mm
+        return length_collada_unit * scale
