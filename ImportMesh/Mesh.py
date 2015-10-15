@@ -50,6 +50,21 @@ class Mesh:
         """
         return self.mesh.scene
 
+    def ratio_mm_per_unit(self):
+        """ returns the number of millimeters per COLLADA unit, in this Mesh
+
+        per:
+        http://pycollada.github.io/reference/generated/collada.Collada.html#collada.Collada.assetInfo
+        http://pycollada.github.io/reference/generated/collada.asset.Asset.html#collada.asset.Asset
+
+        >>> t = Mesh('test/cube.dae')
+        >>> t.ratio_mm_per_unit()
+        25.4
+        """
+        mm_per_meter = 1000
+        meter_per_unit= self.mesh.assetInfo.unitmeter#SI meter per COLLADA unit
+        return meter_per_unit * mm_per_meter
+
     def getFirstTransformOfFirstScene(self):
         """ returns 4x4 numpy array,representing transform of first scene
 
