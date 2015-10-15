@@ -113,8 +113,9 @@ class VectorMesh ( Mesh ):
         >>> part = vect.bottomPart()
         >>> len(part.sections)
         2
-        >>> part[0].dimensions_mm #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-2*6)
-        (112.5, 248) 
+        >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-2*6)
+        >>> [ round(x, 2) for x in part[0].dimensions_mm ]
+        [112.5, 248.0]
         """
         bottom_part = Part()
         list_section_poly_outline = []
@@ -285,14 +286,14 @@ class VectorMesh ( Mesh ):
         (coordinate units are converted to mm using our hardcoded scale factor.
         If we were really diligent, we could probably find the XML element from
         the loaded COLLADA file that defines the per-file scale.)
-        >>> d = VectorMesh('test/cube.dae').get_mm_dist( [120/(4.23*6),0,0], [0,0,0])
+        >>> d = VectorMesh('test/cube.dae').get_mm_dist( [120/(0.0254*1000),0,0], [0,0,0])
         >>> round( d, 4)
         120.0
         """
         scaleO = self.scale_collada#TODO: remove debug
         length_collada_unitO = self.get_collada_unit_dist( list_coord_tuple1, list_coord_tuple2)
         #TODO: obtain real unit to cm scale
-        ratio_mm_per_unit = 0.0254 * (1/25.4)#unit per inch * inch per mm
+        ratio_mm_per_unit = 0.0254 * (1000)#SI meters per unit * mm per meter
         #TODO: obtain real scaling transform
         scale = self.getFirstTransformOfFirstScene().matrix
 
@@ -303,4 +304,4 @@ class VectorMesh ( Mesh ):
         list_coord_tuple2_4x1.append(1)
         coord2 = scale.dot(list_coord_tuple2_4x1)
         length_collada_unit = self.get_collada_unit_dist( coord1[0:3], coord2[0:3])
-        return length_collada_unit*scaleO #ratio_mm_per_unit
+        return length_collada_unit*ratio_mm_per_unit
