@@ -60,7 +60,7 @@ class VectorMesh ( Mesh ):
             for partSection in part: #print its component PartSections
                 print (" * {} section".format(partSection))
             #collect the line segment endpoints, for this Part's sections
-            list_line_segment_endpoints_xyz = part.getAsLineSegments()
+            list_line_segment_endpoints_xyz.extend( part.getAsLineSegments())
 
         # overlay a visualization of this part, onto original COLLADA model,and
         # save original mesh+ these lines to the specified file
@@ -77,7 +77,9 @@ class VectorMesh ( Mesh ):
         # side edges. Then, assuming the mold positive needs an exhaust on the
         # top edge, determine sizes for the three parts for the top edge.
         # Finally calculate dimensions of the mold positive's top face.
-        dictParts = {'Bottom': self.bottomPart()}
+        dictParts = {'Bottom': self.bottomPart()
+                    ,'Left'  : self.sidePart()
+                    }
 
         #TODO: generate side edges,top edge, and top face.
         return dictParts
@@ -186,10 +188,18 @@ class VectorMesh ( Mesh ):
     def sidePart(self):
         """
         Returns a Part representing one of the two edges of molding positive
+
+        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 577.0mm face
+        >>> part = vect.sidePart()
+        >>> len(part.sections)
+        2
+        >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2)
+        >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+        [112.5, 577.4]
         """
-        partSide = Part()
+        part_side = Part()
         # part is built up from one or more layers laminated together.
-        listPolyOutline = [] # polygon, outlining the first layer of the part
+        list_section_poly_outline = [] # polygon, outlining the first layer of the part
         material_thickness_mm = self.material['thickness_mm']
         material_half_kerf_mm = self.getMaterialHalfKerf()
         sections_needed = self.sectionsNeededToCompleteXyPlaneCut()
@@ -197,58 +207,58 @@ class VectorMesh ( Mesh ):
         # define a rectangle for the left side
         corner_top_NW = self.get_corner( [-1,1,1])
         corner_bot_NW = self.get_corner( [-1,1,-1])
-        # (shrink from the west side, to make room for the part on that side.)
+        #FIXME: this part does not need to shrink (shrink from the west side, to make room for the part on that side.)
         scale = self.ratio_mm_per_unit() #TODO: use both the unit ratio AND geometry transform matrix
-        corner_top_NW[1] -= part_thickness_mm/scale
-        corner_bot_NW[1] -= part_thickness_mm/scale
+        #corner_top_NW[1] -= part_thickness_mm/scale
+        #corner_bot_NW[1] -= part_thickness_mm/scale
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
             outside our cut line & for the part dimensions can be ignored)'''
-        corner_top_NW[1] += material_half_kerf_mm/scale
-        corner_bot_NW[1] += material_half_kerf_mm/scale
+        corner_top_NW[0] -= material_half_kerf_mm/scale #N.B.: side part oriented on different plane
+        corner_bot_NW[0] -= material_half_kerf_mm/scale # than the bottomPart.
         # (and make part taller, also to account for 1/2 kerf width)
         corner_top_NW[2] += material_half_kerf_mm/scale
         corner_bot_NW[2] -= material_half_kerf_mm/scale
         list_section_poly_outline.append( corner_top_NW)
         list_section_poly_outline.append( corner_bot_NW)
-        # compute final height of west edge #TODO:refactor this into PartSection
-        length_west_edge = self.get_mm_dist( corner_bot_NW, corner_top_NW)
+        # compute final height of north edge #TODO:refactor this into PartSection
+        length_north_edge = self.get_mm_dist( corner_bot_NW, corner_top_NW)
 
         # line segment2
         #make copies of vertici already used
-        # (also, translate the east side in, to make room for that side's part)
-        corner_bot_NE = self.get_corner( [-1,-1,-1])
-        corner_top_NE = self.get_corner( [-1,-1,1])
-        corner_bot_NE[1] += part_thickness_mm/scale
-        corner_top_NE[1] += part_thickness_mm/scale
+        #FIXME: does not need to translate (also, translate the south edge out, to make room for that side's part)
+        corner_bot_SW = self.get_corner( [1,1,-1])
+        corner_top_SW = self.get_corner( [1,1,1])
+        #corner_bot_SW[0] += part_thickness_mm/scale
+        #corner_top_SW[0] += part_thickness_mm/scale
         # adjust for 1/2 of the cutting tool's kerf width
-        corner_bot_NE[1] -= material_half_kerf_mm/scale
-        corner_top_NE[1] -= material_half_kerf_mm/scale
+        corner_bot_SW[0] += material_half_kerf_mm/scale #NB: south edge out, not west in
+        corner_top_SW[0] += material_half_kerf_mm/scale
         # (again, make part taller to account for the cut's 1/2 kerf width)
-        corner_top_NE[2] += material_half_kerf_mm/scale
-        corner_bot_NE[2] -= material_half_kerf_mm/scale
-        list_section_poly_outline.append( corner_bot_NE )
-        # compute final length of north edge
-        length_north_edge = self.get_mm_dist( corner_bot_NW, corner_bot_NE) 
+        corner_top_SW[2] += material_half_kerf_mm/scale
+        corner_bot_SW[2] -= material_half_kerf_mm/scale
+        list_section_poly_outline.append( corner_bot_SW )
+        # compute final length of west face
+        length_west_face = self.get_mm_dist( corner_bot_NW, corner_bot_SW) #TODO:rename variable to West
         # save human-readable dimensions of the part section
-        set_dimensions_mm_tuple = ( length_west_edge,length_north_edge)
+        set_dimensions_mm_tuple = ( length_north_edge,length_west_face)
 
         # line segment3
-        list_section_poly_outline.append( corner_top_NE)
+        list_section_poly_outline.append( corner_top_SW)
         # line segment4
         # add verts to the list of sections to be cut
         section = PartSection(list_section_poly_outline, set_dimensions_mm_tuple)
-        bottom_part.insertFrontSection( section)
+        part_side.insertFrontSection( section)
         # build additional sections, until the list is thick enough
-        while not self.isCompleteXyPlane( bottom_part.sections):
+        while not self.isCompleteXyPlane( part_side.sections):
             # clone the xyz coords from the section we just created, into a new list
-            set_dimensions_mm_new = deepcopy(bottom_part.sections[0].dimensions_mm)
-            list_vertici_new = deepcopy(bottom_part.sections[0].vertici)
+            set_dimensions_mm_new = deepcopy(part_side.sections[0].dimensions_mm)
+            list_vertici_new = deepcopy(part_side.sections[0].vertici)
             section_new = PartSection(list_vertici_new, set_dimensions_mm_new)
             # now shift the set of lines material_thickness_mm to the Right
             for vert in section_new.vertici:
-                vert[0] += (material_thickness_mm/scale)
-            bottom_part.insertFrontSection( section_new)
-        return bottom_part
+                vert[1] -= (material_thickness_mm/scale) #NB:side part on different plane
+            part_side.insertFrontSection( section_new)
+        return part_side
 
     def get_collada_unit_dist( self, list_coord_tuple1, list_coord_tuple2):
         """
