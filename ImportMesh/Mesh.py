@@ -30,7 +30,7 @@ from collada.geometry import Geometry
 from collada.scene import MaterialNode
 from collada.scene import GeometryNode
 from collada.scene import Node
-from collada.scene import Scene
+from collada.scene import Scene, MatrixTransform
 
 class Mesh:
     def __init__(self, file_path):
@@ -49,6 +49,46 @@ class Mesh:
         pycollada.github.io/reference/generated/collada.scene.Scene.html
         """
         return self.mesh.scene
+
+    def ratio_mm_per_unit(self):
+        """ returns the number of millimeters per COLLADA unit, in this Mesh
+
+        per:
+        http://pycollada.github.io/reference/generated/collada.Collada.html#collada.Collada.assetInfo
+        http://pycollada.github.io/reference/generated/collada.asset.Asset.html#collada.asset.Asset
+
+        >>> t = Mesh('test/cube.dae')
+        >>> t.ratio_mm_per_unit()
+        25.4
+        """
+        mm_per_meter = 1000
+        meter_per_unit= self.mesh.assetInfo.unitmeter#SI meter per COLLADA unit
+        return meter_per_unit * mm_per_meter
+
+    def getFirstTransformOfFirstScene(self):
+        """ returns 4x4 numpy array,representing transform of first scene
+
+        >>> t = Mesh('test/cube.dae').getFirstTransformOfFirstScene()
+        >>> t.matrix
+        array([[ 1.,  0.,  0.,  0.],
+               [ 0.,  1.,  0.,  0.],
+               [ 0.,  0.,  1.,  0.],
+               [ 0.,  0.,  0.,  1.]])
+        >>> import numpy as np
+        >>> np.set_printoptions(6)
+        >>> t = Mesh('test/cube_flipped.dae').getFirstTransformOfFirstScene()
+        >>> t.matrix
+        array([[  1.000000e+00,   0.000000e+00,   0.000000e+00,  -4.373134e-01],
+               [  0.000000e+00,  -1.000000e+00,  -8.187895e-16,  -1.090898e+01],
+               [  0.000000e+00,   8.187895e-16,  -1.000000e+00,   4.659263e+00],
+               [  0.000000e+00,   0.000000e+00,   0.000000e+00,   1.000000e+00]], dtype=float32)
+        """
+        geometry_node_of_scene = self.visual_scene().nodes[0].children[0]
+        if isinstance(geometry_node_of_scene, Node):
+            return geometry_node_of_scene.transforms[0]
+        #else, no transform: generate an Identity MatrixTransform
+        matrix_4x4 = numpy.identity(4)
+        return MatrixTransform(numpy.ravel( matrix_4x4))
         
     def primitives(self):
         """ returns a list of primitive sets specified in the <geometry/>
