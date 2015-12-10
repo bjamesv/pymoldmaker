@@ -181,7 +181,7 @@ class VectorMesh ( Mesh ):
 
     def getMaterialHalfKerf(self):
         """
-        Returns a fr
+        Returns 1/2 the # mm of material the configured tool destroys, per cut
         """
         return 0.5 * self.material['kerf_mm']
 
