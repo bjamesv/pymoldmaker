@@ -1,5 +1,5 @@
 #!/bin/sh
 # Set up required python packages, per:
 # pycollada.readthedocs.org/en/latest/install.html
-sudo apt-get install python3-lxml python3-numpy python3-scipy python3-dateutil python3-pip python-imaging
-sudo python3 -m easy_install pycollada
+python3 -m virtualenv pymoldmaker-env
+source pymoldmaker-env/bin/activate && pip install -r requirements.txt
