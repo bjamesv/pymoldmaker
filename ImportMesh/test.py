@@ -2,6 +2,8 @@
 Simple module defining unittest2 testcases for project doctests
 """
 import doctest
+
+from . import kerf
 import ImportMesh
 
 def load_tests(loader, tests, ignore):
@@ -13,4 +15,5 @@ def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite("ImportMesh.PartSection"))
     tests.addTests(doctest.DocTestSuite("ImportMesh.VectorMesh"))
     tests.addTests(doctest.DocTestSuite("ImportMesh.Mesh"))
+    tests.addTests(doctest.DocTestSuite(kerf))
     return tests
