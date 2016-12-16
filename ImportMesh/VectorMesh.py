@@ -84,7 +84,8 @@ class VectorMesh ( Mesh ):
         dictParts = OrderedDict(
                     (('Bottom', self.bottomPart())
                      ,('Left', self.make_part( ([-1,1,1],[-1,1,-1]), ([1,1,1],[1,1,-1]), (0,2)))
-                     ,('Right-1', self.right_part_i_of_iii())
+                     ,('Right-i', self.right_part_i_of_iii())
+                     ,('Right-ii', self.right_part_ii_of_iii())
                     ))
 
         #TODO: generate side edges,top edge, and top face.
@@ -126,6 +127,25 @@ class VectorMesh ( Mesh ):
         start_edge, end_edge = ([-1,-1,1],[-1,-1,-1]), ([1,-1,1],[1,-1,-1])
         plane = (0,2) # oriented along X Z plane
         shrink_edges = {'right': 145.8} #make room for other Right parts
+        shrink_axis = 0 # shrink along X axis
+        return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
+                              ,thickness_direction_negative=False)
+
+    def right_part_ii_of_iii(self):
+        """
+        Returns a Part representing next-to-bottommost portion of right edge
+
+        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> right_side = vect.right_part_ii_of_iii()
+        >>> len(right_side.sections)
+        2
+        >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-106.3-129.4)
+        >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+        [112.5, 341.7]
+        """
+        start_edge, end_edge = ([-1,-1,1],[-1,-1,-1]), ([1,-1,1],[1,-1,-1])
+        plane = (0,2) # oriented along X Z plane
+        shrink_edges = {'left': 106.3, 'right': 129.4}#room for other Right parts
         shrink_axis = 0 # shrink along X axis
         return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
                               ,thickness_direction_negative=False)
