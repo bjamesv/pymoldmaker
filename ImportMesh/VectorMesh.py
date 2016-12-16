@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from collections import OrderedDict
 
 from ImportMesh import Mesh
 from ImportMesh.Part import Part
@@ -80,10 +81,11 @@ class VectorMesh ( Mesh ):
         # side edges. Then, assuming the mold positive needs an exhaust on the
         # top edge, determine sizes for the three parts for the top edge.
         # Finally calculate dimensions of the mold positive's top face.
-        dictParts = {'Bottom': self.bottomPart()
-                    ,'Left'  : self.make_part( ([-1,1,1],[-1,1,-1]), ([1,1,1],[1,1,-1]), (0,2))
-                    ,'Right-1' : self.right_part_i_of_iii()
-                    }
+        dictParts = OrderedDict(
+                    (('Bottom', self.bottomPart())
+                     ,('Left', self.make_part( ([-1,1,1],[-1,1,-1]), ([1,1,1],[1,1,-1]), (0,2)))
+                     ,('Right-1', self.right_part_i_of_iii())
+                    ))
 
         #TODO: generate side edges,top edge, and top face.
         return dictParts
