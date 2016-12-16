@@ -84,8 +84,8 @@ class VectorMesh ( Mesh ):
         dictParts = OrderedDict(
                     (('Bottom', self.bottomPart())
                      ,('Left', self.make_part( ([-1,1,1],[-1,1,-1]), ([1,1,1],[1,1,-1]), (0,2)))
-                     ,('Right-i', self.right_part_i_of_iii())
-                     ,('Right-ii', self.right_part_ii_of_iii())
+                     ,('Right-i', self.right_part_i_of_v())
+                     ,('Right-ii', self.right_part_ii_of_v())
                     ))
 
         #TODO: generate side edges,top edge, and top face.
@@ -112,12 +112,12 @@ class VectorMesh ( Mesh ):
         sections = self.depth_xy_corner_cut/self.material['thickness_mm']
         return math.ceil( sections) # whole sections required
 
-    def right_part_i_of_iii(self):
+    def right_part_i_of_v(self):
         """
         Returns a Part representing bottommost portion of right edge
 
         >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
-        >>> right_side = vect.right_part_i_of_iii()
+        >>> right_side = vect.right_part_i_of_v()
         >>> len(right_side.sections)
         2
         >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-145.8)
@@ -131,12 +131,12 @@ class VectorMesh ( Mesh ):
         return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
                               ,thickness_direction_negative=False)
 
-    def right_part_ii_of_iii(self):
+    def right_part_ii_of_v(self):
         """
         Returns a Part representing next-to-bottommost portion of right edge
 
         >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
-        >>> right_side = vect.right_part_ii_of_iii()
+        >>> right_side = vect.right_part_ii_of_v()
         >>> len(right_side.sections)
         2
         >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-106.3-129.4)
