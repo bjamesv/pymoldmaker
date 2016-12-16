@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def adjustment_direction(edge, opposite_edge, adjust_axis):
     """
+    Return 1 or -1 for adjust_axis value opposite_edge greater/less than edge
+
+    TODO: this function is used for BOTH kerf adjustment & part shrink
+    (butt joint) adjustment... consider renaming this Python module to reflect
 
     >>> edge = [(-1, 1, 1), (-1, 1, -1)]
     >>> opposite = [(1, 1, 1), (1, 1, -1)]

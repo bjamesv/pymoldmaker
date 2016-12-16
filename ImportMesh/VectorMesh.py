@@ -113,19 +113,19 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing bottommost portion of right edge
 
-        TODO: shrink edge some # of mm from top edge
-
         >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_i_of_iii()
         >>> len(right_side.sections)
         2
-        >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2)
+        >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-145.8)
         >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-        [112.5, 577.4]
+        [112.5, 431.6]
         """
         start_edge, end_edge = ([-1,-1,1],[-1,-1,-1]), ([1,-1,1],[1,-1,-1])
         plane = (0,2) # oriented along X Z plane
-        return self.make_part( start_edge, end_edge, plane
+        shrink_edges = {'right': 145.8} #make room for other Right parts
+        shrink_axis = 0 # shrink along X axis
+        return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
                               ,thickness_direction_negative=False)
 
     def bottomPart(self):
@@ -142,7 +142,7 @@ class VectorMesh ( Mesh ):
         """
         start_edge, end_edge = ([-1,1,1],[-1,1,-1]), ([-1,-1,1],[-1,-1,-1])
         plane = (1,2) # oriented along Y Z plane
-        shrink_edges = ['left','right']
+        shrink_edges = {'left','right'}
         shrink_axis = 1 # shrink along Y axis
         model_center_along_negative_x_axis_from_part = False #it's along positive X axis
         return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
@@ -159,18 +159,17 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing a full edge of the molding positive
 
-        TODO: adapt shrink_sides to support dict argument, specifying mm
-        distance to shrink edge (instead of default, part thickness)
-
         Keyword Arguments:
         start_edge  -- list of two unit-square tuples
         end_edge  -- list of two unit-square tuples
         part_plane  -- integer 2tuple, values 0-2, representing the pair of axis
           parallel to the plane part is majorly oriented along (TODO: should be
           derived from start_edge + end_edge but parameterizing is simple)
-        shrink_sides -- list of strings representing which sides (top,right,
-            bottom,left) of the part must be translated in toward the center to
-            accommodate a butt joint with another part, on that side.
+        shrink_sides -- collection of string keys representing which
+         sides (top,right,bottom,left) of the part must be translated in
+         toward the center to accommodate a butt joint with another part
+         ,on that side. OR a dictionary of string keys with values
+         specifying a number of mm part edge is to be translated.
         shrink_axis -- integer, values 0-2 representing axis part is to shrink
           along
         thickness_direction_negative  -- boolean, indicating if part should be
@@ -188,7 +187,7 @@ class VectorMesh ( Mesh ):
         [112.5, 577.4]
         >>> start_edge, end_edge =([-1,1,1],[-1,1,-1]), ([-1,-1,1],[-1,-1,-1])
         >>> part_plane = (1, 2) # Y & Z-axis (perpendicular to X-axis)
-        >>> shrink_sides = ['left','right']
+        >>> shrink_sides = {'left','right'}
         >>> shrink_axis = 1 # Y-axis
         >>> negative_x_is_toward_center = False
         >>> bottom = vect.make_part(start_edge, end_edge, part_plane, shrink_sides, shrink_axis, negative_x_is_toward_center)
@@ -197,6 +196,13 @@ class VectorMesh ( Mesh ):
         >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-2*6)
         >>> [ round(x, 1) for x in bottom[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
         [112.5, 248.0]
+        >>> shrink_sides = {'left': 'default', 'right': 70}
+        >>> partial_bottom = vect.make_part(start_edge, end_edge, part_plane, shrink_sides, shrink_axis, negative_x_is_toward_center)
+        >>> len(partial_bottom.sections)
+        2
+        >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-70)
+        >>> [ round(x, 1) for x in partial_bottom[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+        [112.5, 190.0]
         """
         part_side = Part()
         # part is built up from one or more layers laminated together.
@@ -210,13 +216,17 @@ class VectorMesh ( Mesh ):
         corner_top_NW = self.get_corner( top_vert)
         corner_bot_NW = self.get_corner( bottom_vert)
         scale = self.ratio_mm_per_unit() #TODO: use both the unit ratio AND geometry transform matrix
+        adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)
         if 'left' in shrink_sides:
             plane = shrink_axis #FIXME: detect which plane the part is oriented on
-            corner_top_NW[plane] -= part_thickness_mm/scale
-            corner_bot_NW[plane] -= part_thickness_mm/scale
+            try:
+                translate_distance_mm = float(shrink_sides['left'])
+            except (TypeError, ValueError) as e: #default to thickness
+                translate_distance_mm = part_thickness_mm
+            corner_top_NW[plane] -= translate_distance_mm/scale * adjust_direction
+            corner_bot_NW[plane] -= translate_distance_mm/scale * adjust_direction
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
             outside our cut line & for the part dimensions can be ignored)'''
-        adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)
         corner_top_NW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
         corner_bot_NW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
         # (and make part taller, also to account for 1/2 kerf width)
@@ -235,8 +245,12 @@ class VectorMesh ( Mesh ):
         corner_top_SW = self.get_corner( top_vert)
         if 'right' in shrink_sides:
             plane = shrink_axis #FIXME: detect which plane the part is oriented on
-            corner_bot_SW[plane] += part_thickness_mm/scale
-            corner_top_SW[plane] += part_thickness_mm/scale
+            try: #TODO: eliminate below code duplication
+                translate_distance_mm = float(shrink_sides['right'])
+            except (TypeError, ValueError) as e: #default to thickness
+                translate_distance_mm = part_thickness_mm
+            corner_bot_SW[plane] += translate_distance_mm/scale * adjust_direction
+            corner_top_SW[plane] += translate_distance_mm/scale * adjust_direction
         # adjust for 1/2 of the cutting tool's kerf width
         adjust_direction = kerf.adjustment_direction(end_edge, start_edge, shrink_axis)
         corner_bot_SW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
