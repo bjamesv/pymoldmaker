@@ -86,6 +86,7 @@ class VectorMesh ( Mesh ):
                      ,('Left', self.make_part( ([-1,1,1],[-1,1,-1]), ([1,1,1],[1,1,-1]), (0,2)))
                      ,('Right-i', self.right_part_i_of_v())
                      ,('Right-ii', self.right_part_ii_of_v())
+                     ,('Right-iii', self.right_part_iii_of_v())
                     ))
 
         #TODO: generate side edges,top edge, and top face.
@@ -146,6 +147,25 @@ class VectorMesh ( Mesh ):
         start_edge, end_edge = ([-1,-1,1],[-1,-1,-1]), ([1,-1,1],[1,-1,-1])
         plane = (0,2) # oriented along X Z plane
         shrink_edges = {'left': 106.3, 'right': 129.4}#room for other Right parts
+        shrink_axis = 0 # shrink along X axis
+        return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
+                              ,thickness_direction_negative=False)
+
+    def right_part_iii_of_v(self):
+        """
+        Returns a Part representing center portion of right edge
+
+        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> right_side = vect.right_part_iii_of_v()
+        >>> len(right_side.sections)
+        2
+        >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-122.7-123.5)
+        >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+        [112.5, 331.2]
+        """
+        start_edge, end_edge = ([-1,-1,1],[-1,-1,-1]), ([1,-1,1],[1,-1,-1])
+        plane = (0,2) # oriented along X Z plane
+        shrink_edges = {'left': 122.7, 'right': 123.5}#room for other Right parts
         shrink_axis = 0 # shrink along X axis
         return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
                               ,thickness_direction_negative=False)
