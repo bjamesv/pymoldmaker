@@ -179,7 +179,7 @@ class VectorMesh ( Mesh ):
         >>> right_side = vect.right_part_iv_of_v()
         >>> len(right_side.sections)
         2
-        >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-128.6-50.7)#todo: adjust +5.9 left -72.8 r
+        >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-128.6-50.7)
         >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
         [112.5, 398.1]
         """
