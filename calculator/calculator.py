@@ -28,7 +28,7 @@ from calculator.Part import Part
 from calculator.PartSection import PartSection
 from . import kerf
 
-class VectorMesh ( Mesh ):
+class Calculator(Mesh):
     # object representing COLLADA mesh of a positive for mold-making, 
     # supplemented with additional generated sets of lines representing the 
     # inventory of pieces of material (wood, plastic, etc.) needed to assemble
@@ -118,7 +118,7 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing bottommost portion of right edge
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_i_of_v()
         >>> len(right_side.sections)
         2
@@ -137,7 +137,7 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing next-to-bottommost portion of right edge
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> vect = Calculator( 'test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_ii_of_v()
         >>> len(right_side.sections)
         2
@@ -156,7 +156,7 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing center portion of right edge
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_iii_of_v()
         >>> len(right_side.sections)
         2
@@ -175,7 +175,7 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing next-to-topmost portion of right edge
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_iv_of_v()
         >>> len(right_side.sections)
         2
@@ -194,7 +194,7 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing topmost portion of right edge
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_v_of_v()
         >>> len(right_side.sections)
         2
@@ -213,7 +213,7 @@ class VectorMesh ( Mesh ):
         """
         Returns a Part representing the bottom edge of the mold making positive
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+        >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> part = vect.bottomPart()
         >>> len(part.sections)
         2
@@ -257,7 +257,7 @@ class VectorMesh ( Mesh ):
           grown more thick (to permit corner-cuts) negatively along axis or
           positively
 
-        >>> vect = VectorMesh( 'test/cube_flipped.dae') #112.1 x 577.0mm face
+        >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 577.0mm face
         >>> start_edge, end_edge = ([-1,1,1],[-1,1,-1]), ([1,1,1],[1,1,-1])
         >>> part_plane = (0, 2) # X & Z-axis (perpendicular to Y)
         >>> left_side = vect.make_part(start_edge, end_edge, part_plane)
@@ -373,7 +373,7 @@ class VectorMesh ( Mesh ):
 
         e.g., distance between origin and the unit vector (1,0,0) is: 1 "unit"
         long
-        >>> VectorMesh('test/cube.dae').get_collada_unit_dist( [1,0,0], [0,0,0])
+        >>> Calculator('test/cube.dae').get_collada_unit_dist( [1,0,0], [0,0,0])
         1.0
         """
         from scipy.spatial.distance import euclidean
@@ -383,7 +383,7 @@ class VectorMesh ( Mesh ):
         """
         Converts a distance in mm along a specific vector, into Collada units.
 
-        >>> d = VectorMesh('test/cube_flipped.dae').get_unit_dist( 20, [1,0,0])
+        >>> d = Calculator('test/cube_flipped.dae').get_unit_dist( 20, [1,0,0])
         >>> round( d, 4)
         22.8782
         """
@@ -401,7 +401,7 @@ class VectorMesh ( Mesh ):
         (coordinate units are converted to mm using our hardcoded scale factor.
         If we were really diligent, we could probably find the XML element from
         the loaded COLLADA file that defines the per-file scale.)
-        >>> d = VectorMesh('test/cube.dae').get_mm_dist( [120/(0.0254*1000),0,0], [0,0,0])
+        >>> d = Calculator('test/cube.dae').get_mm_dist( [120/(0.0254*1000),0,0], [0,0,0])
         >>> round( d, 4)
         120.0
         """

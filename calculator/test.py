@@ -7,7 +7,7 @@ from . import (
      Mesh
     ,Part
     ,PartSection
-    ,VectorMesh
+    ,calculator
     ,kerf
 )
 
@@ -17,7 +17,7 @@ def load_tests(loader, tests, ignore):
     """
     tests.addTests(doctest.DocTestSuite(Part))
     tests.addTests(doctest.DocTestSuite(PartSection))
-    tests.addTests(doctest.DocTestSuite(VectorMesh))
+    tests.addTests(doctest.DocTestSuite(calculator))
     tests.addTests(doctest.DocTestSuite(Mesh))
     tests.addTests(doctest.DocTestSuite(kerf))
     return tests
