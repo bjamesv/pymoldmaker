@@ -18,16 +18,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from collections import OrderedDict
-
-from ImportMesh import Mesh
-from ImportMesh.Part import Part
-from ImportMesh.PartSection import PartSection
-
-from . import kerf
-
 from copy import deepcopy
 import math
+
 import numpy
+
+from calculator.Mesh import Mesh
+from calculator.Part import Part
+from calculator.PartSection import PartSection
+from . import kerf
 
 class VectorMesh ( Mesh ):
     # object representing COLLADA mesh of a positive for mold-making, 

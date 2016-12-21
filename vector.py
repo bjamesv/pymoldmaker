@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from image import Canvas
-from ImportMesh import VectorMesh
+from calculator.VectorMesh import VectorMesh
 import argparse
 
 if __name__ == '__main__':
@@ -32,12 +32,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     input_file = args.input
     ## import a simple Sketchup COLLADA file
-    mesh = VectorMesh( input_file)
+    mold = VectorMesh(input_file)
     ## set the thickness
-    mesh.material['thickness_mm'] = args.thickness_mm
+    mold.material['thickness_mm'] = args.thickness_mm
     ## test a modification to the file & resave
     file_new = args.out
-    mesh.save( file_new)
+    mold.save(file_new)
     ## test exporting to EPS
     img = Canvas()
     poly_line_mm = (  (80,80),(320,80)

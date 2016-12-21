@@ -66,7 +66,7 @@ class Part:
         returns a list of XYZ coord pairs, representing the part.
 
         >>> p = Part()
-        >>> from ImportMesh import PartSection
+        >>> from calculator.PartSection import PartSection
         >>> l1 = [[0,0,0],[0,0,1]]
         >>> l2 = [[0,4,0],[0,4,1]]
         >>> p.insertFrontSection(PartSection(l1,(1,0)))
