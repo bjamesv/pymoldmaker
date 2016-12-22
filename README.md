@@ -3,11 +3,11 @@
 PyMoldmaker is a program designed to automatically generate woodworking "cut lists" from COLLADA 3d models. PyMoldmaker cutlists assist in the precise construction of inexpensive plaster-casting molds, for the hand-layup of carbon fiber parts.
 
 ##Overview
- - 3d model of part
- - Cutlist
- - Assembled blank or 'positive' of the part
- - Plaster mold
- - Use the mold!
+ - [3d model of part](#step-1-obtaining-3d-model)
+ - [Cutlist](#step-2-generate-cutlist-with-pymoldmaker)
+ - [Assembled blank or 'positive' of the part](#step-3-assemble-molding-positive)
+ - [Plaster mold](#step-4-create-mold)
+ - [Use the mold!](#step-5-use-the-mold)
 
 ##Step 1: Obtaining 3d model
 Obtain a 3d model in COLLADA (.dae) file format, representing the actual size of the item to be molded.
