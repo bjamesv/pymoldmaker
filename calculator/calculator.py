@@ -50,25 +50,67 @@ class Calculator(Mesh):
     def save(self, file_path):
         """ save mesh and supplemental PartSections out to a COLLADA file.
         """
+        print(self.parts_to_string()) #print human-readable output to console
+
+        #TODO: eliminate below code duplicated in 'parts_to_string'
+        # get Parts (... and their component PartSections)
+        parts = self.generateParts()
+
+        # convert mold-making PartSections into list of 3d-coord pairs("lines")
+        list_line_segment_endpoints_xyz = list()
+        for keyPartName in parts.keys():
+            part = parts[keyPartName] #get part
+            #collect the line segment endpoints, for this Part's sections
+            list_line_segment_endpoints_xyz.extend(part.getAsLineSegments())
+
+        # overlay a visualization of this part, onto original COLLADA model,and
+        # save original mesh+ these lines to the specified file
+        self.save_lines( file_path, list_line_segment_endpoints_xyz)
+        return
+
+    def parts_to_string(self):
+        """
+        Returns String, representing a human-readable cutlist for parts
+
+        >>> from pprint import pprint
+        >>> mold_maker = Calculator('test/cube_flipped.dae')
+        >>> pprint(mold_maker.parts_to_string())
+        ('# Cutlist\\n'
+         '## Bottom Part\\n'
+         ' * (112.5 mm, 248.0 mm) section\\n'
+         ' * (112.5 mm, 248.0 mm) section\\n'
+         '## Left Part\\n'
+         ' * (112.5 mm, 577.4 mm) section\\n'
+         ' * (112.5 mm, 577.4 mm) section\\n'
+         '## Right-i Part\\n'
+         ' * (112.5 mm, 431.6 mm) section\\n'
+         ' * (112.5 mm, 431.6 mm) section\\n'
+         '## Right-ii Part\\n'
+         ' * (112.5 mm, 341.7 mm) section\\n'
+         ' * (112.5 mm, 341.7 mm) section\\n'
+         '## Right-iii Part\\n'
+         ' * (112.5 mm, 331.2 mm) section\\n'
+         ' * (112.5 mm, 331.2 mm) section\\n'
+         '## Right-iv Part\\n'
+         ' * (112.5 mm, 398.1 mm) section\\n'
+         ' * (112.5 mm, 398.1 mm) section\\n'
+         '## Right-v Part\\n'
+         ' * (112.5 mm, 526.7 mm) section\\n'
+         ' * (112.5 mm, 526.7 mm) section')
+        """
         # get Parts (... and their component PartSections)
         dictParts = self.generateParts()
 
         # convert mold-making PartSections into list of 3d-coord pairs("lines")
         list_line_segment_endpoints_xyz = list()
         # ..and while we convert, also print human-readable cutlist
-        print ("# Cutlist")
+        output = "# Cutlist"
         for keyPartName in dictParts.keys():
-            part = dictParts[keyPartName] #get part, print its name        
-            print ("## {} Part".format(keyPartName))
+            part = dictParts[keyPartName] #get part, print its name
+            output += '\n' + "## {} Part".format(keyPartName)
             for partSection in part: #print its component PartSections
-                print (" * {} section".format(partSection))
-            #collect the line segment endpoints, for this Part's sections
-            list_line_segment_endpoints_xyz.extend( part.getAsLineSegments())
-
-        # overlay a visualization of this part, onto original COLLADA model,and
-        # save original mesh+ these lines to the specified file
-        self.save_lines( file_path, list_line_segment_endpoints_xyz)
-        return
+                output += '\n' + " * {} section".format(partSection)
+        return output
 
     def generateParts(self):
         """
