@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from collections import OrderedDict
 from copy import deepcopy
 import math
+from ast import literal_eval
 
 import numpy
 
@@ -46,6 +47,52 @@ class Calculator(Mesh):
     depth_xy_corner_cut = 11. #TODO: lookup/detect actual depth
     """ depth in mm of the 45deg corner cuts that bisect the XY plane of the 
         flat positive being molded"""
+
+    def __init__(self, mesh_path):
+        """
+        Construct Calculator for COLLADA mesh & part description files
+        """
+        Mesh.__init__(self, mesh_path)
+
+        #fetch mold part descriptions
+        # assume COLLADA mesh file has .dae extension
+        extension_length = 4 # ".dae", ".DAE", etc.
+        # .. and assume part descriptions .py file is in same directory
+        directions_path = mesh_path[:-1*extension_length] + ".py"
+        # fetch the Python 'parts' list from directions file
+        try:
+            self.directions = self.get_directions_from_module_file(directions_path)
+        except FileNotFoundError:
+            self.directions = [] #default: no directions
+
+    def get_directions_from_module_file(self, directions_path):
+        """
+        Returns directions for mold subparts from referenced .py file
+
+        .py module file is expected to define a single, anonymous list
+
+        >>> from tempfile import NamedTemporaryFile
+        >>> # test file with empty list
+        >>> with NamedTemporaryFile() as directions:
+        ...   directions.write("[]".encode('utf-8')) #prints '2' to stdout
+        ...   directions.seek(0) #prints '0' to stdout
+        ...   test_maker = Calculator('test/cube.dae')
+        ...   test_maker.get_directions_from_module_file(directions.name)
+        2
+        0
+        []
+        >>> # test file with bad list
+        >>> with NamedTemporaryFile() as directions:
+        ...   directions.write("invalid = []".encode('utf-8'))
+        ...   directions.seek(0)
+        ...   test_maker = Calculator('test/cube.dae')
+        ...   test_maker.get_directions_from_module_file(directions.name)
+        Traceback (most recent call last):
+           ...
+        SyntaxError: invalid syntax
+        """
+        with open(directions_path) as parts_file:
+            return literal_eval(parts_file.read())
 
     def save(self, file_path):
         """ save mesh and supplemental PartSections out to a COLLADA file.
@@ -122,15 +169,10 @@ class Calculator(Mesh):
         # side edges. Then, assuming the mold positive needs an exhaust on the
         # top edge, determine sizes for the three parts for the top edge.
         # Finally calculate dimensions of the mold positive's top face.
-        dictParts = OrderedDict(
-                    (('Bottom', self.bottomPart())
-                     ,('Left', self.make_part( ([-1,1,1],[-1,1,-1]), ([1,1,1],[1,1,-1]), (0,2)))
-                     ,('Right-i', self.right_part_i_of_v())
-                     ,('Right-ii', self.right_part_ii_of_v())
-                     ,('Right-iii', self.right_part_iii_of_v())
-                     ,('Right-iv', self.right_part_iv_of_v())
-                     ,('Right-v', self.right_part_v_of_v())
-                    ))
+        parts_generator = ((name, self.make_part(**args)) #name/part tuples
+                           for name,args
+                           in self.directions)
+        dictParts = OrderedDict(parts_generator)
 
         #TODO: generate top edge, and top face.
         return dictParts
@@ -160,6 +202,8 @@ class Calculator(Mesh):
         """
         Returns a Part representing bottommost portion of right edge
 
+        FIXME: dead code, refactor into a calculator unit test case
+
         >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_i_of_v()
         >>> len(right_side.sections)
@@ -178,6 +222,8 @@ class Calculator(Mesh):
     def right_part_ii_of_v(self):
         """
         Returns a Part representing next-to-bottommost portion of right edge
+
+        FIXME: dead code, refactor into a calculator unit test case
 
         >>> vect = Calculator( 'test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_ii_of_v()
@@ -198,6 +244,8 @@ class Calculator(Mesh):
         """
         Returns a Part representing center portion of right edge
 
+        FIXME: dead code, refactor into a calculator unit test case
+
         >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_iii_of_v()
         >>> len(right_side.sections)
@@ -216,6 +264,8 @@ class Calculator(Mesh):
     def right_part_iv_of_v(self):
         """
         Returns a Part representing next-to-topmost portion of right edge
+
+        FIXME: dead code, refactor into a calculator unit test case
 
         >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_iv_of_v()
@@ -236,6 +286,8 @@ class Calculator(Mesh):
         """
         Returns a Part representing topmost portion of right edge
 
+        FIXME: dead code, refactor into a calculator unit test case
+
         >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> right_side = vect.right_part_v_of_v()
         >>> len(right_side.sections)
@@ -254,6 +306,8 @@ class Calculator(Mesh):
     def bottomPart(self):
         """
         Returns a Part representing the bottom edge of the mold making positive
+
+        FIXME: dead code, refactor into a calculator unit test case
 
         >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
         >>> part = vect.bottomPart()
