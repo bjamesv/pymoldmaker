@@ -277,7 +277,7 @@ class Calculator(Mesh):
         """
         return 0.5 * self.material['kerf_mm']
 
-    def make_part(self, start_edge, end_edge, part_plane, shrink_sides=[], shrink_axis=0
+    def make_part(self, start_edge, end_edge, part_plane, shrink_edges=[], shrink_axis=0
             ,thickness_direction_negative=True):
         """
         Returns a Part representing a full edge of the molding positive
@@ -288,7 +288,7 @@ class Calculator(Mesh):
         part_plane  -- integer 2tuple, values 0-2, representing the pair of axis
           parallel to the plane part is majorly oriented along (TODO: should be
           derived from start_edge + end_edge but parameterizing is simple)
-        shrink_sides -- collection of string keys representing which
+        shrink_edges -- collection of string keys representing which
          sides (top,right,bottom,left) of the part must be translated in
          toward the center to accommodate a butt joint with another part
          ,on that side. OR a dictionary of string keys with values
@@ -340,10 +340,10 @@ class Calculator(Mesh):
         corner_bot_NW = self.get_corner( bottom_vert)
         scale = self.ratio_mm_per_unit() #TODO: use both the unit ratio AND geometry transform matrix
         adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)
-        if 'left' in shrink_sides:
+        if 'left' in shrink_edges:
             plane = shrink_axis #FIXME: detect which plane the part is oriented on
             try:
-                translate_distance_mm = float(shrink_sides['left'])
+                translate_distance_mm = float(shrink_edges['left'])
             except (TypeError, ValueError) as e: #default to thickness
                 translate_distance_mm = part_thickness_mm
             corner_top_NW[plane] -= translate_distance_mm/scale * adjust_direction
@@ -366,10 +366,10 @@ class Calculator(Mesh):
         top_vert, bottom_vert = end_edge
         corner_bot_SW = self.get_corner( bottom_vert)
         corner_top_SW = self.get_corner( top_vert)
-        if 'right' in shrink_sides:
+        if 'right' in shrink_edges:
             plane = shrink_axis #FIXME: detect which plane the part is oriented on
             try: #TODO: eliminate below code duplication
-                translate_distance_mm = float(shrink_sides['right'])
+                translate_distance_mm = float(shrink_edges['right'])
             except (TypeError, ValueError) as e: #default to thickness
                 translate_distance_mm = part_thickness_mm
             corner_bot_SW[plane] += translate_distance_mm/scale * adjust_direction
