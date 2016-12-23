@@ -58,3 +58,108 @@ def test_bottom_part():
     [112.5, 248.0]
     """
     pass
+
+def test_right_part_i_of_v():
+    """
+    Check dimensions of Part representing bottommost portion of right edge
+
+    >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
+    ...              ,"part_plane": (0,2) #oriented along X Z plane
+    ...              ,"shrink_edges": {'right': 145.8} #room for other Right parts
+    ...              ,"shrink_axis": 0 # shrink along X axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> right_side = vect.make_part(**test_args)
+    >>> len(right_side.sections)
+    2
+    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-145.8)
+    >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [112.5, 431.6]
+    """
+    pass
+
+def test_right_part_ii_of_v():
+    """
+    Check dimensions of Part representing next-to-bottommost portion of right edge
+
+    >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
+    ...              ,"part_plane": (0,2) #oriented along X Z plane
+    ...              ,"shrink_edges": {'left': 106.3, 'right': 129.4}#room for other Right parts
+    ...              ,"shrink_axis": 0 # shrink along X axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator( 'test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> right_side = vect.make_part(**test_args)
+    >>> len(right_side.sections)
+    2
+    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-106.3-129.4)
+    >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [112.5, 341.7]
+    """
+    pass
+
+def test_right_part_iii_of_v():
+    """
+    Check dimensions of Part representing center portion of right edge
+
+    >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
+    ...              ,"part_plane": (0,2) #oriented along X Z plane
+    ...              ,"shrink_edges": {'left': 122.7, 'right': 123.5}#room for other Right parts
+    ...              ,"shrink_axis": 0 # shrink along X axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> right_side = vect.make_part(**test_args)
+    >>> len(right_side.sections)
+    2
+    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-122.7-123.5)
+    >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [112.5, 331.2]
+    """
+    pass
+
+def test_right_part_iv_of_v():
+    """
+    Check dimensions of Part representing next-to-topmost portion of right edge
+
+    >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
+    ...              ,"part_plane": (0,2) #oriented along X Z plane
+    ...              ,"shrink_edges": {'left': 128.6, 'right': 50.7}#room for other Right parts
+    ...              ,"shrink_axis": 0 # shrink along X axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> right_side = vect.make_part(**test_args)
+    >>> len(right_side.sections)
+    2
+    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-128.6-50.7)
+    >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [112.5, 398.1]
+    """
+    pass
+
+def test_right_part_v_of_v():
+    """
+    Check dimensions of Part representing topmost portion of right edge
+
+    >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
+    ...              ,"part_plane": (0,2) #oriented along X Z plane
+    ...              ,"shrink_edges": {'left': 50.7}#room for other Right parts
+    ...              ,"shrink_axis": 0 # shrink along X axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> right_side = vect.make_part(**test_args)
+    >>> len(right_side.sections)
+    2
+    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-50.7)#todo: adjust +5.9 left -72.8 r
+    >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [112.5, 526.7]
+    """
+    pass
