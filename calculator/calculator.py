@@ -376,28 +376,6 @@ class Calculator(Mesh):
         return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
                               ,thickness_direction_negative=False)
 
-    def bottomPart(self):
-        """
-        Returns a Part representing the bottom edge of the mold making positive
-
-        FIXME: dead code, refactor into a calculator unit test case
-
-        >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
-        >>> part = vect.bottomPart()
-        >>> len(part.sections)
-        2
-        >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-2*6)
-        >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-        [112.5, 248.0]
-        """
-        start_edge, end_edge = ([-1,1,1],[-1,1,-1]), ([-1,-1,1],[-1,-1,-1])
-        plane = (1,2) # oriented along Y Z plane
-        shrink_edges = {'left','right'}
-        shrink_axis = 1 # shrink along Y axis
-        model_center_along_negative_x_axis_from_part = False #it's along positive X axis
-        return self.make_part( start_edge, end_edge, plane, shrink_edges, shrink_axis
-                              ,model_center_along_negative_x_axis_from_part)
-
     def getMaterialHalfKerf(self):
         """
         Returns 1/2 the # mm of material the configured tool destroys, per cut
