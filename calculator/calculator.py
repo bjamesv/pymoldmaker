@@ -120,8 +120,81 @@ class Calculator(Mesh):
         Returns String, representing a human-readable cutlist for parts
 
         >>> from pprint import pprint
-        >>> mold_maker = Calculator('test/cube_flipped.dae')
-        >>> pprint(mold_maker.parts_to_string())
+        >>> from tempfile import NamedTemporaryFile
+        >>> import os
+        >>> # prepare fake geometry & real part design files
+        >>> with NamedTemporaryFile() as fake_mesh, NamedTemporaryFile() as part_design, open('test/cube.dae') as real_mesh:
+        ...    # make part_design filename look related to fake_mesh filename
+        ...    orig_fullpath = part_design.name
+        ...    orig_dir = os.path.dirname(part_design.name)
+        ...    mesh_filename = os.path.basename(fake_mesh.name)
+        ...    new_filename = mesh_filename[:-4]+'.py'
+        ...    new_fullpath = os.path.join(orig_dir, new_filename)
+        ...    os.rename(part_design.name, new_fullpath)
+        ...    part_design.name = new_fullpath
+        ...    part_design.write('''# Simple Python module defining an anonymous list of mold parts
+        ... [##List of parts (e.g.: friendly names + arguments for calculator.make_part)
+        ...    ("Bottom", { "start_edge": ([-1,1,1],[-1,1,-1])
+        ...                ,"end_edge": ([-1,-1,1],[-1,-1,-1])
+        ...                ,"part_plane": (1,2) # oriented along Y Z plane
+        ...                ,"shrink_edges": {"left", "right"}
+        ...                ,"shrink_axis": 1 # shrink along Y axis
+        ...                ,"thickness_direction_negative": False #model_center_along_negative_x_axis_from_part
+        ...                })
+        ...    ,("Left", { "start_edge": ([-1,1,1],[-1,1,-1])
+        ...               ,"end_edge": ([1,1,1],[1,1,-1])
+        ...               ,"part_plane": (0,2) #oriented along X Z plane
+        ...               })
+        ...    ,("Right-i", { "start_edge": ([-1,-1,1],[-1,-1,-1])
+        ...                  ,"end_edge": ([1,-1,1],[1,-1,-1])
+        ...                  ,"part_plane": (0,2) #oriented along X Z plane
+        ...                  ,"shrink_edges": {'right': 145.8} #room for other Right parts
+        ...                  ,"shrink_axis": 0 # shrink along X axis
+        ...                  ,"thickness_direction_negative": False
+        ...                  })
+        ...    ,("Right-ii", { "start_edge": ([-1,-1,1],[-1,-1,-1])
+        ...                   ,"end_edge": ([1,-1,1],[1,-1,-1])
+        ...                   ,"part_plane": (0,2) #oriented along X Z plane
+        ...                   ,"shrink_edges": {'left': 106.3, 'right': 129.4}#room for other Right parts
+        ...                   ,"shrink_axis": 0 # shrink along X axis
+        ...                   ,"thickness_direction_negative": False
+        ...                   })
+        ...    ,("Right-iii", { "start_edge": ([-1,-1,1],[-1,-1,-1])
+        ...                    ,"end_edge": ([1,-1,1],[1,-1,-1])
+        ...                    ,"part_plane": (0,2) #oriented along X Z plane
+        ...                    ,"shrink_edges": {'left': 122.7, 'right': 123.5}#room for other Right parts
+        ...                    ,"shrink_axis": 0 # shrink along X axis
+        ...                    ,"thickness_direction_negative": False
+        ...                    })
+        ...    ,("Right-iv", { "start_edge": ([-1,-1,1],[-1,-1,-1])
+        ...                   ,"end_edge": ([1,-1,1],[1,-1,-1])
+        ...                   ,"part_plane": (0,2) #oriented along X Z plane
+        ...                   ,"shrink_edges": {'left': 128.6, 'right': 50.7}#room for other Right parts
+        ...                   ,"shrink_axis": 0 # shrink along X axis
+        ...                   ,"thickness_direction_negative": False
+        ...                   })
+        ...    ,("Right-v", { "start_edge": ([-1,-1,1],[-1,-1,-1])
+        ...                  ,"end_edge": ([1,-1,1],[1,-1,-1])
+        ...                  ,"part_plane": (0,2) #oriented along X Z plane
+        ...                  ,"shrink_edges": {'left': 50.7}#room for other Right parts
+        ...                  ,"shrink_axis": 0 # shrink along X axis
+        ...                  ,"thickness_direction_negative": False
+        ...                  })
+        ... ]'''.encode('utf-8'))
+        ...    part_design.seek(0)
+        ...    # prepare a random geometry file
+        ...    fake_mesh.write(real_mesh.read().encode('utf-8'))
+        ...    fake_mesh.seek(0)
+        ...    # Test!
+        ...    mold_maker = Calculator(fake_mesh.name)
+        ...    pprint(mold_maker.parts_to_string())
+        ...    # post-test, restore temp filename
+        ...    os.rename(part_design.name, orig_fullpath)
+        ...    part_design.name = orig_fullpath
+        2680
+        0
+        5183
+        0
         ('# Cutlist\\n'
          '## Bottom Part\\n'
          ' * (112.5 mm, 248.0 mm) section\\n'
