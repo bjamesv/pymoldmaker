@@ -340,6 +340,12 @@ class Calculator(Mesh):
         corner_bot_NW = self.get_corner( bottom_vert)
         scale = self.ratio_mm_per_unit() #TODO: use both the unit ratio AND geometry transform matrix
         adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)
+        # raise error, if any unrecognized shrink directions are specified
+        supported_shrinks = {'left', 'right', 'bottom'}
+        unsupported_shrink_keys = set(shrink_edges) - supported_shrinks
+        if any(unsupported_shrink_keys):
+            raise TypeError('Unsupported shrink edges: {}'.format(unsupported_shrink_keys))
+        # shrink dimensions
         if 'left' in shrink_edges:
             plane = shrink_axis #FIXME: detect which plane the part is oriented on
             try:
@@ -348,6 +354,14 @@ class Calculator(Mesh):
                 translate_distance_mm = part_thickness_mm
             corner_top_NW[plane] -= translate_distance_mm/scale * adjust_direction
             corner_bot_NW[plane] -= translate_distance_mm/scale * adjust_direction
+        if 'bottom' in shrink_edges:
+            plane = (set(part_plane)-{shrink_axis}).pop()
+            adjust_direction = kerf.adjustment_direction(start_edge, end_edge, plane)
+            try:
+                translate_distance_mm = float(shrink_edges['bottom'])
+            except (TypeError, ValueError) as e: #default to thickness
+                translate_distance_mm = part_thickness_mm
+            corner_bot_NW[plane] += translate_distance_mm/scale * adjust_direction
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
             outside our cut line & for the part dimensions can be ignored)'''
         corner_top_NW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
@@ -374,6 +388,14 @@ class Calculator(Mesh):
                 translate_distance_mm = part_thickness_mm
             corner_bot_SW[plane] += translate_distance_mm/scale * adjust_direction
             corner_top_SW[plane] += translate_distance_mm/scale * adjust_direction
+        if 'bottom' in shrink_edges:
+            plane = (set(part_plane)-{shrink_axis}).pop()
+            adjust_direction = kerf.adjustment_direction(start_edge, end_edge, plane)
+            try:
+                translate_distance_mm = float(shrink_edges['bottom'])
+            except (TypeError, ValueError) as e: #default to thickness
+                translate_distance_mm = part_thickness_mm
+            corner_bot_SW[plane] += translate_distance_mm/scale * adjust_direction
         # adjust for 1/2 of the cutting tool's kerf width
         adjust_direction = kerf.adjustment_direction(end_edge, start_edge, shrink_axis)
         corner_bot_SW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
