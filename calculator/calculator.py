@@ -390,6 +390,7 @@ class Calculator(Mesh):
         corner_top_SW = self.get_corner( top_vert)
         if 'right' in shrink_edges:
             plane = shrink_axis #FIXME: detect which plane the part is oriented on
+            adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)#TODO: refactor this terrible, duplicative code
             try: #TODO: eliminate below code duplication
                 translate_distance_mm = float(shrink_edges['right'])
             except (TypeError, ValueError) as e: #default to thickness
