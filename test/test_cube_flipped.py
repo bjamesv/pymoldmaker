@@ -156,7 +156,7 @@ def test_left():
     >>> right_side = vect.make_part(**test_args)
     >>> len(right_side.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-145.8)
+    >>> #(112.1+.4/2+.4/2-2*6, 577.0+.4/2+.4/2-145.8)
     >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
     [100.5, 577.0]
     """
