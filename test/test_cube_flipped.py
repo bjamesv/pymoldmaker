@@ -25,16 +25,17 @@ def test_top_part_i_of_iii():
     >>> test_args = { "start_edge": ([1,1,1],[1,1,-1])
     ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
     ...              ,"part_plane": (1,2) #oriented along Y Z plane
-    ...              ,"shrink_edges": {"left": 'joint-default', "right": 104+115.4+18.7}#room for other Top parts
+    ...              ,"shrink_edges": {"left": 'joint-default', "right": 104+115.4+18.7#room for other Top parts
+    ...                               ,"bottom": 9.8}#room for Back part
     ...              ,"shrink_axis": 1 # shrink along Y axis
     ...              }
     >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
     >>> part = vect.make_part(**test_args)
     >>> len(part.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-104-115.4-18.7)
+    >>> #(112.1+.4/2+.4/2-2*6, 271.6+.4/2+.4/2-2*6-104-115.4-18.7)
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 21.9]
+    [102.7, 21.9]
     """
     pass
 
@@ -85,7 +86,8 @@ def test_bottom_part():
     >>> test_args = { "start_edge": ([-1,1,1],[-1,1,-1])
     ...            ,"end_edge": ([-1,-1,1],[-1,-1,-1])
     ...            ,"part_plane": (1,2) # oriented along Y Z plane
-    ...            ,"shrink_edges": {"left", "right"}
+    ...            ,"shrink_edges": {"left": 'joint-default', "right": 'joint-default'
+    ...                              ,"bottom": 'joint-default'} #room for Back part
     ...            ,"shrink_axis": 1 # shrink along Y axis
     ...            ,"thickness_direction_negative": False #model_center_along_negative_x_axis_from_part
     ...            }
@@ -95,7 +97,27 @@ def test_bottom_part():
     2
     >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-2*6)
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 248.0]
+    [100.5, 248.0]
+    """
+    pass
+
+def test_left():
+    """
+    Check dimensions of Part representing lleft edge
+
+    >>> test_args = { "start_edge": ([-1,1,1],[-1,1,-1])
+    ...              ,"end_edge": ([1,1,1],[1,1,-1])
+    ...              ,"part_plane": (0,2) #oriented along X Z plane
+    ...              ,"shrink_edges": {"bottom": 'joint-default'}#room for Back part
+    ...              ,"shrink_axis": 0 #X axis for left/right
+    ...             }
+    >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> right_side = vect.make_part(**test_args)
+    >>> len(right_side.sections)
+    2
+    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-145.8)
+    >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [100.5, 577.0]
     """
     pass
 
