@@ -38,6 +38,26 @@ def test_top_part_i_of_iii():
     """
     pass
 
+def test_top_part_ii_of_iii():
+    """
+    Check dimensions of Part representing center portion of mold top
+
+    >>> test_args = { "start_edge": ([1,1,1],[1,1,-1])
+    ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
+    ...              ,"part_plane": (1,2) #oriented along Y Z plane
+    ...              ,"shrink_edges": {"left": 'joint-default', "right": 115.4+18.7}#room for other Top parts
+    ...              ,"shrink_axis": 1 # shrink along Y axis
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> part = vect.make_part(**test_args)
+    >>> len(part.sections)
+    2
+    >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-115.4-18.7)
+    >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [112.5, 125.9]
+    """
+    pass
+
 def test_bottom_part():
     """
     Check dimensions of Part representing bottom edge of mold making positive
