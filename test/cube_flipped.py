@@ -17,7 +17,7 @@
     ,("Top-ii", { "start_edge": ([1,1,1],[1,1,-1])
               ,"end_edge": ([1,-1,1],[1,-1,-1])
               ,"part_plane": (1,2) #oriented along Y Z plane
-              ,"shrink_edges": {"left": 'joint-default', "right": 115.4+18.7}#room for other Top parts
+              ,"shrink_edges": {"left": 18.7+130.2, "right": 115.4+18.7}#room for other Top parts
               ,"shrink_axis": 1 # shrink along Y axis
               })
     ,("Top-iii", { "start_edge": ([1,1,1],[1,1,-1])
