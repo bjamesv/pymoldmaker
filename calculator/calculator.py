@@ -372,6 +372,7 @@ class Calculator(Mesh):
             corner_top_NW[plane] -= translate_distance_mm/scale * adjust_direction
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
             outside our cut line & for the part dimensions can be ignored)'''
+        adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)#TODO: refactor this terrible, duplicative code
         corner_top_NW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
         corner_bot_NW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
         # (and make part taller, also to account for 1/2 kerf width)
