@@ -13,7 +13,7 @@
               ,"end_edge": ([1,-1,1],[1,-1,-1])
               ,"part_plane": (1,2) #oriented along Y Z plane
               ,"shrink_edges": {"left": 'joint-default', "right": 104+115.4+18.7 #room for other Top parts
-                               ,"bottom": 9.8}#room for Back part
+                               ,"bottom": 'joint-default'}#room for Back part
               ,"shrink_axis": 1 # shrink along Y axis
               })
     ,("Top-ii", { "start_edge": ([1,1,1],[1,1,-1])

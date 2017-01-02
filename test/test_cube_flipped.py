@@ -26,7 +26,7 @@ def test_top_part_i_of_iii():
     ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
     ...              ,"part_plane": (1,2) #oriented along Y Z plane
     ...              ,"shrink_edges": {"left": 'joint-default', "right": 104+115.4+18.7#room for other Top parts
-    ...                               ,"bottom": 9.8}#room for Back part
+    ...                               ,"bottom": 'joint-default'}#room for Back part
     ...              ,"shrink_axis": 1 # shrink along Y axis
     ...              }
     >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
@@ -35,7 +35,7 @@ def test_top_part_i_of_iii():
     2
     >>> #(112.1+.4/2+.4/2-2*6, 271.6+.4/2+.4/2-2*6-104-115.4-18.7)
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [102.7, 21.9]
+    [100.5, 21.9]
     """
     pass
 
