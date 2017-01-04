@@ -253,7 +253,7 @@ def test_right_part_v_of_v():
     >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
     ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
     ...              ,"part_plane": (0,2) #oriented along X Z plane
-    ...              ,"shrink_edges": {'left': 50.7}#room for other Right parts
+    ...              ,"shrink_edges": {'left': 201.4}#room for other Right parts
     ...              ,"shrink_axis": 0 # shrink along X axis
     ...              ,"thickness_direction_negative": False
     ...              }
@@ -261,8 +261,8 @@ def test_right_part_v_of_v():
     >>> right_side = vect.make_part(**test_args)
     >>> len(right_side.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-50.7)#todo: adjust +5.9 left -72.8 r
+    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-128.6-72.8)#todo: adjust +5.9 left -72.8 r
     >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 526.7]
+    [112.5, 376.0]
     """
     pass

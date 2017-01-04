@@ -65,7 +65,7 @@
     ,("Right-v", { "start_edge": ([-1,-1,1],[-1,-1,-1])
                   ,"end_edge": ([1,-1,1],[1,-1,-1])
                   ,"part_plane": (0,2) #oriented along X Z plane
-                  ,"shrink_edges": {'left': 50.7}#room for other Right parts
+                  ,"shrink_edges": {'left': 201.4}#room for other Right parts
                   ,"shrink_axis": 0 # shrink along X axis
                   ,"thickness_direction_negative": False
                   })
