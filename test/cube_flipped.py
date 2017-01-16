@@ -88,4 +88,11 @@
                   ,"shrink_axis":1 #Y axis
                   ,"thickness_direction_negative": False
                   })
+    ,("Back-iii", { "start_edge": ([1,-1,-1],[-1,-1,-1])
+                  ,"end_edge": ([1,1,-1],[-1,1,-1])
+                  ,"part_plane": (0,1) #oriented along X Y plane
+                  ,"shrink_edges": {"right": 104+130.2+18.7} #room for other Back parts
+                  ,"shrink_axis":1 #Y axis
+                  ,"thickness_direction_negative": False
+                  })
 ]

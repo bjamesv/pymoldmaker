@@ -143,6 +143,27 @@ def test_back_part_ii_of_iii():
     """
     pass
 
+def test_back_part_iii_of_iii():
+    """
+    Check dimensions of Part representing rightmost back of mold making positive
+
+    >>> test_args = { "start_edge": ([1,-1,-1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,1,-1],[-1,1,-1])
+    ...              ,"part_plane": (0,1) #oriented along X Y plane
+    ...              ,"shrink_edges": {"right": 104+130.2+18.7} #room for other Back parts
+    ...              ,"shrink_axis": 1 #Y axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #577.0 x 271.6mm face
+    >>> part = vect.make_part(**test_args)
+    >>> len(part.sections)
+    2
+    >>> #part width: 271.6-(104+130.2+18.7)
+    >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [577.0, 18.7]
+    """
+    pass
+
 def test_left():
     """
     Check dimensions of Part representing lleft edge
