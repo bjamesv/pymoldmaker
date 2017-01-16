@@ -25,7 +25,8 @@
     ,("Top-iii", { "start_edge": ([1,1,1],[1,1,-1])
               ,"end_edge": ([1,-1,1],[1,-1,-1])
               ,"part_plane": (1,2) #oriented along Y Z plane
-              ,"shrink_edges": {"left": 18.7+130.2+104, "right": 'joint-default'}#room for other Top parts
+              ,"shrink_edges": {"left": 18.7+130.2+104, "right": 'joint-default' #room for other Top parts
+                                ,"bottom": 'joint-default'}#room for Back part
               ,"shrink_axis": 1 # shrink along Y axis
               })
     ,("Left", { "start_edge": ([-1,1,1],[-1,1,-1])
@@ -37,7 +38,8 @@
     ,("Right-i", { "start_edge": ([-1,-1,1],[-1,-1,-1])
                   ,"end_edge": ([1,-1,1],[1,-1,-1])
                   ,"part_plane": (0,2) #oriented along X Z plane
-                  ,"shrink_edges": {'right': 145.8} #room for other Right parts
+                  ,"shrink_edges": {'right': 145.8 #room for other Right parts
+                                   ,'bottom': 'joint-default'}#room for Bottom part
                   ,"shrink_axis": 0 # shrink along X axis
                   ,"thickness_direction_negative": False
                   })
@@ -51,7 +53,8 @@
     ,("Right-iii", { "start_edge": ([-1,-1,1],[-1,-1,-1])
                     ,"end_edge": ([1,-1,1],[1,-1,-1])
                     ,"part_plane": (0,2) #oriented along X Z plane
-                    ,"shrink_edges": {'left': 122.7, 'right': 123.5}#room for other Right parts
+                    ,"shrink_edges": {'left': 122.7, 'right': 123.5 #room for other Right parts
+                                     ,'bottom': 'joint-default'}#room for Bottom part
                     ,"shrink_axis": 0 # shrink along X axis
                     ,"thickness_direction_negative": False
                     })
@@ -65,7 +68,8 @@
     ,("Right-v", { "start_edge": ([-1,-1,1],[-1,-1,-1])
                   ,"end_edge": ([1,-1,1],[1,-1,-1])
                   ,"part_plane": (0,2) #oriented along X Z plane
-                  ,"shrink_edges": {'left': 201.4}#room for other Right parts
+                  ,"shrink_edges": {'left': 201.4 #room for other Right parts
+                                   ,"bottom": 'joint-default'}#room for Back part
                   ,"shrink_axis": 0 # shrink along X axis
                   ,"thickness_direction_negative": False
                   })

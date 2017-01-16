@@ -66,16 +66,17 @@ def test_top_part_iii_of_iii():
     >>> test_args = { "start_edge": ([1,1,1],[1,1,-1])
     ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
     ...              ,"part_plane": (1,2) #oriented along Y Z plane
-    ...              ,"shrink_edges": {"left": 18.7+130.2+104, "right": 'joint-default'}#room for other Top parts
+    ...              ,"shrink_edges": {"left": 18.7+130.2+104, "right": 'joint-default' #room for other Top parts
+    ...                               ,"bottom": 'joint-default'}#room for Back part
     ...              ,"shrink_axis": 1 # shrink along Y axis
     ...              }
     >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
     >>> part = vect.make_part(**test_args)
     >>> len(part.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-130.2-18.7-104)
+    >>> #(112.1+.4/2+.4/2-2*6, 271.6+.4/2+.4/2-2*6-130.2-18.7-104)
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 7.1]
+    [100.5, 7.1]
     """
     pass
 
@@ -169,7 +170,8 @@ def test_right_part_i_of_v():
     >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
     ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
     ...              ,"part_plane": (0,2) #oriented along X Z plane
-    ...              ,"shrink_edges": {'right': 145.8} #room for other Right parts
+    ...              ,"shrink_edges": {'right': 145.8 #room for other Right parts
+    ...                               ,'bottom': 'joint-default'}#room for Bottom part
     ...              ,"shrink_axis": 0 # shrink along X axis
     ...              ,"thickness_direction_negative": False
     ...              }
@@ -177,9 +179,9 @@ def test_right_part_i_of_v():
     >>> right_side = vect.make_part(**test_args)
     >>> len(right_side.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-145.8)
+    >>> #(112.1+.4/2+.4/2-6*2, 577.0+.4/2+.4/2-145.8)
     >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 431.6]
+    [100.5, 431.6]
     """
     pass
 
@@ -211,7 +213,8 @@ def test_right_part_iii_of_v():
     >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
     ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
     ...              ,"part_plane": (0,2) #oriented along X Z plane
-    ...              ,"shrink_edges": {'left': 122.7, 'right': 123.5}#room for other Right parts
+    ...              ,"shrink_edges": {'left': 122.7, 'right': 123.5 #room for other Right parts
+    ...                               ,'bottom': 'joint-default'}#room for Bottom part
     ...              ,"shrink_axis": 0 # shrink along X axis
     ...              ,"thickness_direction_negative": False
     ...              }
@@ -219,9 +222,9 @@ def test_right_part_iii_of_v():
     >>> right_side = vect.make_part(**test_args)
     >>> len(right_side.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-122.7-123.5)
+    >>> #(112.1+.4/2+.4/2-6*2, 577.0+.4/2+.4/2-122.7-123.5)
     >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 331.2]
+    [100.5, 331.2]
     """
     pass
 
@@ -253,7 +256,8 @@ def test_right_part_v_of_v():
     >>> test_args = { "start_edge": ([-1,-1,1],[-1,-1,-1])
     ...              ,"end_edge": ([1,-1,1],[1,-1,-1])
     ...              ,"part_plane": (0,2) #oriented along X Z plane
-    ...              ,"shrink_edges": {'left': 201.4}#room for other Right parts
+    ...              ,"shrink_edges": {'left': 201.4 #room for other Right parts
+    ...                               ,"bottom": 'joint-default'}#room for Back part
     ...              ,"shrink_axis": 0 # shrink along X axis
     ...              ,"thickness_direction_negative": False
     ...              }
@@ -261,8 +265,8 @@ def test_right_part_v_of_v():
     >>> right_side = vect.make_part(**test_args)
     >>> len(right_side.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 577.0+.4/2+.4/2-128.6-72.8)#todo: adjust +5.9 left -72.8 r
+    >>> #(112.1+.4/2+.4/2-6*2, 577.0+.4/2+.4/2-128.6-72.8)#todo: adjust +5.9 left -72.8 r
     >>> [ round(x, 1) for x in right_side[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 376.0]
+    [100.5, 376.0]
     """
     pass
