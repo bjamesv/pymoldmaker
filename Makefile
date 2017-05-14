@@ -1,10 +1,12 @@
 # -*- indent-tabs-mode:t; -*-
 
+include Makefile.properties.mk
+
 .PHONY: test debug
 
 test	: *
-	python3 -m unittest discover
+	. ${env_cmd} && python3 -m unittest discover
 
 debug	:
-	python3 -m pdb vector.py
+	. ${env_cmd} && python3 -m pdb vector.py
 
