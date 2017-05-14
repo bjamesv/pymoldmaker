@@ -326,6 +326,18 @@ class Calculator(Mesh):
         >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-70)
         >>> [ round(x, 1) for x in partial_bottom[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
         [112.5, 190.0]
+        >>> # Check a part, oriented along X/Y plane
+        >>> start_edge, end_edge =([1,-1,-1],[-1,-1,-1]), ([1,1,-1],[-1,1,-1])
+        >>> part_plane = (0, 1) # X & Y-axis (perpendicular to Z-axis)
+        >>> shrink_sides = {'left'}
+        >>> shrink_axis = 1 # Y-axis
+        >>> negative_x_is_toward_center = False
+        >>> bottom = vect.make_part(start_edge, end_edge, part_plane, shrink_sides, shrink_axis, negative_x_is_toward_center)
+        >>> len(bottom.sections)
+        2
+        >>> #(557.0+.4/2+.4/2, 271.6+.4/2+.4/2-2*6)
+        >>> [ round(x, 1) for x in bottom[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+        [577.4, 260.0]
         """
         part_side = Part()
         # part is built up from one or more layers laminated together.

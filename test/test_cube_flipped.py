@@ -158,9 +158,9 @@ def test_back_part_iii_of_iii():
     >>> part = vect.make_part(**test_args)
     >>> len(part.sections)
     2
-    >>> #part width: 271.6-(104+130.2+18.7)
+    >>> #part width: 271.6-(104+130.2+18.7)+.4/2+.4/2
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [577.0, 18.7]
+    [577.0, 19.1]
     """
     pass
 
