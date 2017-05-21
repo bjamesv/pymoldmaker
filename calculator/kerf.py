@@ -38,42 +38,47 @@ def adjustment_axis_directions(edge, opposite, translation_axis, part_plane, cor
     >>> corner = (1, 1, -1)
     >>> adjustment_axis_directions(edge, opposite, translation_axis, part_plane, corner)
     (1, 1, 0)
-    >>> edge, opposite =([1,-1,-1],[-1,-1,-1]), ([1,1,-1],[-1,1,-1])
-    >>> translation_axis = 1 #Y
-    >>> part_plane = (0, 1) #X/Y plane (Z-normal)
     >>> corner = (-1, 1, -1)
     >>> adjustment_axis_directions(edge, opposite, translation_axis, part_plane, corner)
     (-1, 1, 0)
+    >>> corner = (1, -1, -1)
+    >>> #import pdb; pdb.set_trace(); #TODO: remove debug!
+    >>> adjustment_axis_directions(edge, opposite, translation_axis, part_plane, corner)
+    (1, -1, 0)
     """
     scale = [0, 0, 0]
 
-    #case1, X shrink dimension (use start/end edges as-is)
-    if translation_axis == 0:
-        start_edge, end_edge = edge, opposite
-
-    #case1, Y shrink dimension (rotate orientation 90deg)
-    if translation_axis == 1:
+    def _get_start_end_edge(edge, opposite, translation_axis, corner, axis):
         # determine where on edge or opposite, the corner is
-        edge_is_start = corner in edge
+        edge_is_start = tuple(corner) in (tuple(v) for v in edge)
         if edge_is_start:
             start_vertex_index = [tuple(v) for v in edge].index(tuple(corner))
         else:
             start_vertex_index = [tuple(v) for v in opposite].index(tuple(corner))
 
-        # rotate
-        initial, second = opposite, edge
-        if edge_is_start:
-            initial, second = edge, opposite
-        start_edge = (initial[start_vertex_index], second[start_vertex_index])
-        second_vertex_index = ({0,1} - {start_vertex_index}).pop()
-        end_edge = (initial[second_vertex_index], second[second_vertex_index])
+        if translation_axis == axis:
+            # axis is parallel to edge-opposite translation axis
+            # so: use start/end edges as-is
+            start_edge, end_edge = opposite, edge
+            if edge_is_start:
+                start_edge, end_edge = edge, opposite
+        else:
+            # opposite translated from edge on axis perpendicular to this one
+            # so: rotate 90deg
 
-    if 0 in part_plane:
-        scale[0] = adjustment_direction(start_edge, end_edge, 0)
-    if 1 in part_plane:
-        scale[1] = adjustment_direction(start_edge, end_edge, 1) #TODO: is this right?
-    if 2 in part_plane:
-        scale[2] = adjustment_direction(start_edge, end_edge, 2) #TODO: is this right?
+            # rotate
+            initial, second = opposite, edge
+            if edge_is_start:
+                initial, second = edge, opposite
+            start_edge = (initial[start_vertex_index], second[start_vertex_index])
+            second_vertex_index = ({0,1} - {start_vertex_index}).pop()
+            end_edge = (initial[second_vertex_index], second[second_vertex_index])
+        return start_edge, end_edge
+
+    for axis in range(3):
+        if axis in part_plane:
+            start_edge, end_edge = _get_start_end_edge(edge, opposite, translation_axis, corner, axis)
+            scale[axis] = adjustment_direction(start_edge, end_edge, axis)
     return tuple(scale)
 
 def adjustment_direction(edge, opposite_edge, adjust_axis):
@@ -104,7 +109,6 @@ def adjustment_direction(edge, opposite_edge, adjust_axis):
     which_vertex = 0 #arbitrarily select first one
     edge_vertex = edge[which_vertex]
     opposite_edge_vertex = opposite_edge[which_vertex]
-    edge_minus_opposite = edge_vertex[adjust_axis] - opposite_edge_vertex[adjust_axis]
-    if (edge_minus_opposite) < 0:
+    if edge_vertex[adjust_axis] < opposite_edge_vertex[adjust_axis]:
         adjust_direction = -1
     return adjust_direction
