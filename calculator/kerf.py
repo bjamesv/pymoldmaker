@@ -20,6 +20,62 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+def adjustment_axis_directions(edge, opposite, translation_axis, part_plane, corner, adjust_in=False):
+    """
+    Return 3tuple of 1, 0, -1 representing axis direction to move corner
+      further or closer to center of rectangle defined by start & end edges 
+
+    >>> edge = [(-1, 1, 1), (-1, 1, -1)]
+    >>> opposite = [(1, 1, 1), (1, 1, -1)]
+    >>> translation_axis = 0 #X
+    >>> part_plane = (0, 2) #X/Z plane (Y-normal)
+    >>> corner = (-1, 1, 1)
+    >>> adjustment_axis_directions(edge, opposite, translation_axis, part_plane, corner)
+    (-1, 0, 1)
+    >>> edge, opposite =([1,-1,-1],[-1,-1,-1]), ([1,1,-1],[-1,1,-1])
+    >>> translation_axis = 1 #Y
+    >>> part_plane = (0, 1) #X/Y plane (Z-normal)
+    >>> corner = (1, 1, -1)
+    >>> adjustment_axis_directions(edge, opposite, translation_axis, part_plane, corner)
+    (1, 1, 0)
+    >>> edge, opposite =([1,-1,-1],[-1,-1,-1]), ([1,1,-1],[-1,1,-1])
+    >>> translation_axis = 1 #Y
+    >>> part_plane = (0, 1) #X/Y plane (Z-normal)
+    >>> corner = (-1, 1, -1)
+    >>> adjustment_axis_directions(edge, opposite, translation_axis, part_plane, corner)
+    (-1, 1, 0)
+    """
+    scale = [0, 0, 0]
+
+    #case1, X shrink dimension (use start/end edges as-is)
+    if translation_axis == 0:
+        start_edge, end_edge = edge, opposite
+
+    #case1, Y shrink dimension (rotate orientation 90deg)
+    if translation_axis == 1:
+        # determine where on edge or opposite, the corner is
+        edge_is_start = corner in edge
+        if edge_is_start:
+            start_vertex_index = [tuple(v) for v in edge].index(tuple(corner))
+        else:
+            start_vertex_index = [tuple(v) for v in opposite].index(tuple(corner))
+
+        # rotate
+        initial, second = opposite, edge
+        if edge_is_start:
+            initial, second = edge, opposite
+        start_edge = (initial[start_vertex_index], second[start_vertex_index])
+        second_vertex_index = ({0,1} - {start_vertex_index}).pop()
+        end_edge = (initial[second_vertex_index], second[second_vertex_index])
+
+    if 0 in part_plane:
+        scale[0] = adjustment_direction(start_edge, end_edge, 0)
+    if 1 in part_plane:
+        scale[1] = adjustment_direction(start_edge, end_edge, 1) #TODO: is this right?
+    if 2 in part_plane:
+        scale[2] = adjustment_direction(start_edge, end_edge, 2) #TODO: is this right?
+    return tuple(scale)
+
 def adjustment_direction(edge, opposite_edge, adjust_axis):
     """
     Return 1 or -1 for adjust_axis value opposite_edge greater/less than edge
