@@ -384,12 +384,16 @@ class Calculator(Mesh):
             corner_top_NW[plane] -= translate_distance_mm/scale * adjust_direction
         ''' adjust for half of the cutting tool's kerf (other half of kerf lies
             outside our cut line & for the part dimensions can be ignored)'''
-        adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)#TODO: refactor this terrible, duplicative code
-        corner_top_NW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
-        corner_bot_NW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
-        # (and make part taller, also to account for 1/2 kerf width)
-        corner_top_NW[part_plane[1]] += material_half_kerf_mm/scale
-        corner_bot_NW[part_plane[1]] -= material_half_kerf_mm/scale
+        top_vert, bottom_vert = end_edge
+        corner_bot_SW = self.get_corner( bottom_vert)
+        corner_top_SW = self.get_corner( top_vert)
+
+        part_corners = ((corner, axis) for corner in (corner_top_NW, corner_bot_NW) for axis in part_plane)
+        adjust_directions = ((c,a, kerf.adjustment_axis_directions((corner_top_NW, corner_bot_NW), (corner_top_SW, corner_bot_SW), shrink_axis, part_plane, c))
+                             for c,a in part_corners)
+
+        for corner, axis, adjust_direction in adjust_directions:
+            corner[axis] += material_half_kerf_mm/scale * adjust_direction[axis]
         list_section_poly_outline.append( corner_top_NW)
         list_section_poly_outline.append( corner_bot_NW)
         # compute final height of north edge #TODO:refactor this into PartSection
@@ -398,9 +402,6 @@ class Calculator(Mesh):
         # line segment2
         #make copies of vertici already used
         #FIXME: does not need to translate (also, translate the south edge out, to make room for that side's part)
-        top_vert, bottom_vert = end_edge
-        corner_bot_SW = self.get_corner( bottom_vert)
-        corner_top_SW = self.get_corner( top_vert)
         if 'right' in shrink_edges:
             plane = shrink_axis #FIXME: detect which plane the part is oriented on
             adjust_direction = kerf.adjustment_direction(start_edge, end_edge, shrink_axis)#TODO: refactor this terrible, duplicative code
@@ -427,12 +428,13 @@ class Calculator(Mesh):
                 translate_distance_mm = part_thickness_mm
             corner_top_SW[plane] -= translate_distance_mm/scale * adjust_direction
         # adjust for 1/2 of the cutting tool's kerf width
-        adjust_direction = kerf.adjustment_direction(end_edge, start_edge, shrink_axis)
-        corner_bot_SW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
-        corner_top_SW[part_plane[0]] += material_half_kerf_mm/scale * adjust_direction
-        # (again, make part taller to account for the cut's 1/2 kerf width)
-        corner_top_SW[part_plane[1]] += material_half_kerf_mm/scale
-        corner_bot_SW[part_plane[1]] -= material_half_kerf_mm/scale
+
+        part_corners = ((corner, axis) for corner in (corner_top_SW, corner_bot_SW) for axis in part_plane)
+        adjust_directions = ((c,a, kerf.adjustment_axis_directions((corner_top_NW, corner_bot_NW), (corner_top_SW, corner_bot_SW), shrink_axis, part_plane, c))
+                             for c,a in part_corners)
+        for corner, axis, adjust_direction in adjust_directions:
+            corner[axis] += material_half_kerf_mm/scale * adjust_direction[axis]
+
         list_section_poly_outline.append( corner_bot_SW )
         # compute final length of west face
         length_west_face = self.get_mm_dist( corner_bot_NW, corner_bot_SW) #TODO:rename variable to West
