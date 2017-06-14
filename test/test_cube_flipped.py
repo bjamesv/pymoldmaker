@@ -105,7 +105,7 @@ def test_bottom_part():
     """
     pass
 
-def test_back_part_i_of_iii():
+def test_back_part_i_of_v():
     """
     Check dimensions of Part representing leftmost back of mold making positive
 
@@ -125,7 +125,7 @@ def test_back_part_i_of_iii():
     """
     pass
 
-def test_back_part_ii_of_iii():
+def test_back_part_ii_of_v():
     """
     Check dimensions of Part representing center back of mold making positive
 
@@ -146,7 +146,7 @@ def test_back_part_ii_of_iii():
     """
     pass
 
-def test_back_part_iii_of_iii():
+def test_back_part_iii_of_v():
     """
     Check dimensions of Part representing rightmost back of mold making positive
 
@@ -164,6 +164,54 @@ def test_back_part_iii_of_iii():
     >>> #part width: 271.6-(104+130.2+18.7)+.4/2+.4/2
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
     [577.4, 19.1]
+    """
+    pass
+
+def test_back_part_iv_of_v():
+    """
+    Check dimensions of Part representing a void in right side of rightmost back part of mold making positive
+
+    >>> test_args = { "start_edge": ([1,-1,-1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,1,-1],[-1,1,-1])
+    ...              ,"part_plane": (0,1) #oriented along X Y plane
+    ...              ,"shrink_edges": {"right": 380.8
+    ...                               ,"top": 50.6
+    ...                               ,"bottom": 128.6}
+    ...              ,"shrink_axis": 1 #Y axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #577.0 x 271.6mm face
+    >>> part = vect.make_part(**test_args)
+    >>> len(part.sections)
+    2
+    >>> #part height: 577-(252-(201.4-128.6)-50.6)-50.6+.4
+    >>> #part width: 271.6-(387-6.2)+.4
+    >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [398.2, 109.2]
+    """
+    pass
+
+def test_back_part_v_of_v():
+    """
+    Check dimensions of Part representing a second void for ethernet port on right side of rightmost back part of mold making positive
+
+    >>> test_args = {"start_edge": ([1,-1,-1],[-1,-1,-1])
+    ...              ,"end_edge": ([1,1,-1],[-1,1,-1])
+    ...              ,"part_plane": (0,1) #oriented along X Y plane
+    ...              ,"shrink_edges": {"right": 378.7
+    ...                               ,"top": 129.4
+    ...                               ,"bottom": 106.3}
+    ...              ,"shrink_axis": 1 #Y axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    >>> vect = Calculator('test/cube_flipped.dae') #577.0 x 271.6mm face
+    >>> part = vect.make_part(**test_args)
+    >>> len(part.sections)
+    2
+    >>> #part height: 577-(252-129.4-106.3)+.4
+    >>> #part width: 271.6-(387-8.3)+.4
+    >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
+    [341.7, 107.1]
     """
     pass
 

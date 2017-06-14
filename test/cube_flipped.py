@@ -95,4 +95,22 @@
                   ,"shrink_axis":1 #Y axis
                   ,"thickness_direction_negative": False
                   })
+     ,("Back-iv",  {"start_edge": ([1,-1,-1],[-1,-1,-1])
+                  ,"end_edge": ([1,1,-1],[-1,1,-1])
+                  ,"part_plane": (0,1) #oriented along X Y plane
+                  ,"shrink_edges": {"right": 380.8
+                                   ,"top": 50.6
+                                   ,"bottom": 128.6}
+                  ,"shrink_axis": 1 #Y axis
+                  ,"thickness_direction_negative": False
+                  })
+     ,("Back-v",  {"start_edge": ([1,-1,-1],[-1,-1,-1])
+                  ,"end_edge": ([1,1,-1],[-1,1,-1])
+                  ,"part_plane": (0,1) #oriented along X Y plane
+                  ,"shrink_edges": {"right": 378.7
+                                   ,"top": 129.4
+                                   ,"bottom": 106.3}
+                  ,"shrink_axis": 1 #Y axis
+                  ,"thickness_direction_negative": False
+                  })
 ]
