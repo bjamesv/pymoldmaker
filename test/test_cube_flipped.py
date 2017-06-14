@@ -53,9 +53,12 @@ def test_top_part_ii_of_iii():
     >>> part = vect.make_part(**test_args)
     >>> len(part.sections)
     2
-    >>> #(112.1+.4/2+.4/2, 271.6+.4/2+.4/2-2*6-115.4-18.7*2-130.2)
+    >>> #[ 112.1+.4/2+.4/2, (271.6-115.4-18.7*2-130.2)+(+.4/2+.4/2)
+    >>> #FIXME: yields a 11.4 wide part instead of 11.0 because test
+    >>> # part is less wide than the total left+right shrink distance.
+    >>> # After exploratory testing, confident 11.4 (not "-11") is Ok
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [112.5, 11.0]
+    [112.5, 11.4]
     """
     pass
 
@@ -113,12 +116,12 @@ def test_back_part_i_of_iii():
     ...              ,"shrink_axis":1 #Y axis
     ...              ,"thickness_direction_negative": False
     ...              }
-    >>> vect = Calculator('test/cube_flipped.dae') #112.1 x 271.6mm face
+    >>> vect = Calculator('test/cube_flipped.dae') #577mm x 271.6mm face
     >>> part = vect.make_part(**test_args)
     >>> len(part.sections)
     2
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [577.0, 33.5]
+    [577.4, 33.9]
     """
     pass
 
@@ -139,7 +142,7 @@ def test_back_part_ii_of_iii():
     >>> len(part.sections)
     2
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [565.0, 11.4]
+    [565.4, 11.4]
     """
     pass
 
@@ -158,9 +161,9 @@ def test_back_part_iii_of_iii():
     >>> part = vect.make_part(**test_args)
     >>> len(part.sections)
     2
-    >>> #part width: 271.6-(104+130.2+18.7)
+    >>> #part width: 271.6-(104+130.2+18.7)+.4/2+.4/2
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
-    [577.0, 18.7]
+    [577.4, 19.1]
     """
     pass
 
