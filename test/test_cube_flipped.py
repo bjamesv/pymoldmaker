@@ -174,6 +174,9 @@ def test_back_part_iii_of_v():
     >>> #part width: 271.6-(104+130.2+18.7)+.4/2+.4/2
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
     [577.4, 19.1]
+    >>> #hole in part: 398.2mm x 109.2mm
+    >>> [round(x, 1) for x in part.voids[0][0].dimensions_mm] #FIXME: precision finer than 0.1mm should be possible
+    [398.2, 109.2]
     """
     pass
 
