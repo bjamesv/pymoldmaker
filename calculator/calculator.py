@@ -461,11 +461,11 @@ class Calculator(Mesh):
                 else:
                     vert[grow_axis] += (material_thickness_mm/scale)
             part_side.insertFrontSection( section_new)
-        try:
-            for subtract_part in subtract_parts:
-                part_side.insertSubtractPart(subtract_part)
-        except e:
-            import pdb; pdb.set_trace()#TODO: Remove debug!
+
+        # build any subtractive voids
+        for subtract_part_args in subtract_parts:
+            subtract_part = self.make_part(**subtract_part_args)
+            part_side.insertSubtractPart(subtract_part)
         return part_side
 
     def get_collada_unit_dist( self, list_coord_tuple1, list_coord_tuple2):

@@ -43,7 +43,9 @@ class Part:
         , ...] representing a set of line segments, defining the geometry of
         the plaster molding blank's bottom section.
         """
-        self.material = material_dict 
+        self.material = material_dict
+        self.voids = []
+        # list of Parts, representing rectangular holes in this part
 
     
     def __getitem__(self, key):
@@ -60,6 +62,20 @@ class Part:
         [[0, 1, 1], [0, 0, 1]]
         """
         self.sections.insert(0, part_section)
+
+    def insertSubtractPart(self, subtract_part):
+        """
+        insert new Part into the 0th index of the voids list
+
+        >>> p, hole1, hole2 = Part(), Part(), Part()
+        >>> p.insertSubtractPart(hole1)
+        >>> p.insertSubtractPart(hole2)
+        >>> p.voids[0] is hole2
+        True
+        >>> p.voids[1] is hole1
+        True
+        """
+        self.voids.insert(0, subtract_part)
 
     def getAsLineSegments( self):
         """
