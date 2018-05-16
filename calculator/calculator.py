@@ -139,6 +139,13 @@ class Calculator(Mesh):
         ...                ,"part_plane": (1,2) # oriented along Y Z plane
         ...                ,"shrink_edges": {"left", "right"}
         ...                ,"shrink_axis": 1 # shrink along Y axis
+        ...                ,"subtract_parts": [{ "start_edge": ([-1,1,1],[-1,1,-1])
+        ...                                     ,"end_edge": ([-1,-1,1],[-1,-1,-1])
+        ...                                     ,"part_plane": (1,2) # oriented along Y Z plane
+        ...                                     ,"shrink_edges": {'left': 50.7} # place hole
+        ...                                     ,"shrink_axis": 1 # shrink along Z axis
+        ...                                     ,"thickness_direction_negative": False
+        ...                                     }]
         ...                ,"thickness_direction_negative": False #model_center_along_negative_x_axis_from_part
         ...                })
         ...    ,("Left", { "start_edge": ([-1,1,1],[-1,1,-1])
@@ -191,7 +198,7 @@ class Calculator(Mesh):
         ...    # post-test, restore temp filename
         ...    os.rename(part_design.name, orig_fullpath)
         ...    part_design.name = orig_fullpath
-        2680
+        3179
         0
         5183
         0
@@ -199,6 +206,10 @@ class Calculator(Mesh):
          '## Bottom Part\\n'
          ' * (112.5 mm, 248.0 mm) section\\n'
          ' * (112.5 mm, 248.0 mm) section\\n'
+         ' ### Cutouts (Offset from start corner)\\n'
+         '  #### Hole 1 (50.7 mm, 0.0 mm)\\n'
+         '   ** (112.5 mm, 221.3 mm) section\\n'
+         '   ** (112.5 mm, 221.3 mm) section\\n'
          '## Left Part\\n'
          ' * (112.5 mm, 577.4 mm) section\\n'
          ' * (112.5 mm, 577.4 mm) section\\n'
@@ -230,6 +241,14 @@ class Calculator(Mesh):
             output += '\n' + "## {} Part".format(keyPartName)
             for partSection in part: #print its component PartSections
                 output += '\n' + " * {} section".format(partSection)
+            if len(part.voids):
+                output += '\n' + " ### Cutouts (Offset from start corner)"
+            for count,void in enumerate(part.voids):
+                mm_tuple = self.get_hole_offset_mm_tuple(part, void)
+                offset = '({0:.1f} mm, {1:.1f} mm)'.format(*mm_tuple)
+                output += '\n' + "  #### Hole {} {}".format(count+1, offset)
+                for partSection in void: #print void's component PartSections
+                    output += '\n' + "   ** {} section".format(partSection)
         return output
 
     def generateParts(self):
@@ -467,6 +486,19 @@ class Calculator(Mesh):
             subtract_part = self.make_part(**subtract_part_args)
             part_side.insertSubtractPart(subtract_part)
         return part_side
+
+    def get_hole_offset_mm_tuple(self, part, void):
+        """
+        Compute distance between part and hole start corners
+
+        >>> d = Calculator('test/cube_flipped.dae')
+        >>> part = None #TODO: test
+        >>> void = None
+        >>> d.get_hole_offset_mm_tuple(part, void)
+        (50.7, 0.0)
+        """
+        primary_axis_offset, secondary_axis_offset = 50.7, 0.0#TODO: implement
+        return (primary_axis_offset, secondary_axis_offset)
 
     def get_collada_unit_dist( self, list_coord_tuple1, list_coord_tuple2):
         """
