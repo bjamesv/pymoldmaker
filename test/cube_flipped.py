@@ -93,6 +93,14 @@
                   ,"part_plane": (0,1) #oriented along X Y plane
                   ,"shrink_edges": {"right": 252.9} #room for other Back parts (104+130.2+18.7)
                   ,"shrink_axis":1 #Y axis
+                  ,"subtract_parts": [{ "start_edge": ([1,-1,-1],[-1,-1,-1])
+                                       ,"end_edge": ([1,1,-1],[-1,1,-1])
+                                       ,"part_plane": (0,1) #oriented along X Y plane
+                                       ,"shrink_edges": { "right": 378.7
+                                                         ,"top": 129.4
+                                                         ,"bottom": 106.3}
+                                       ,"shrink_axis": 1 #Y axis
+                                       ,"thickness_direction_negative": False}]
                   ,"thickness_direction_negative": False
                   })
      ,("Back-iv",  {"start_edge": ([1,-1,-1],[-1,-1,-1])
