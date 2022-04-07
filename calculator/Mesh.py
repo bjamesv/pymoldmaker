@@ -70,18 +70,19 @@ class Mesh:
 
         >>> t = Mesh('test/cube.dae').getFirstTransformOfFirstScene()
         >>> t.matrix
-        array([[ 1.,  0.,  0.,  0.],
-               [ 0.,  1.,  0.,  0.],
-               [ 0.,  0.,  1.,  0.],
-               [ 0.,  0.,  0.,  1.]])
+        array([[1., 0., 0., 0.],
+               [0., 1., 0., 0.],
+               [0., 0., 1., 0.],
+               [0., 0., 0., 1.]])
         >>> import numpy as np
         >>> np.set_printoptions(6)
         >>> t = Mesh('test/cube_flipped.dae').getFirstTransformOfFirstScene()
         >>> t.matrix
-        array([[  1.000000e+00,   0.000000e+00,   0.000000e+00,  -4.373134e-01],
-               [  0.000000e+00,  -1.000000e+00,  -8.187895e-16,  -1.090898e+01],
-               [  0.000000e+00,   8.187895e-16,  -1.000000e+00,   4.659263e+00],
-               [  0.000000e+00,   0.000000e+00,   0.000000e+00,   1.000000e+00]], dtype=float32)
+        array([[ 1.000000e+00,  0.000000e+00,  0.000000e+00, -4.373134e-01],
+               [ 0.000000e+00, -1.000000e+00, -8.187895e-16, -1.090898e+01],
+               [ 0.000000e+00,  8.187895e-16, -1.000000e+00,  4.659263e+00],
+               [ 0.000000e+00,  0.000000e+00,  0.000000e+00,  1.000000e+00]],
+              dtype=float32)
         """
         geometry_node_of_scene = self.visual_scene().nodes[0].children[0]
         if isinstance(geometry_node_of_scene, Node):
