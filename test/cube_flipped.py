@@ -12,20 +12,20 @@
     ,("Top-i", { "start_edge": ([1,1,1],[1,1,-1])
               ,"end_edge": ([1,-1,1],[1,-1,-1])
               ,"part_plane": (1,2) #oriented along Y Z plane
-              ,"shrink_edges": {"left": 'joint-default', "right": 104+115.4+18.7 #room for other Top parts
+              ,"shrink_edges": {"left": 'joint-default', "right": 238.1 #room for other Top parts (r: 104+115.4+18.7)
                                ,"bottom": 'joint-default'}#room for Back part
               ,"shrink_axis": 1 # shrink along Y axis
               })
     ,("Top-ii", { "start_edge": ([1,1,1],[1,1,-1])
               ,"end_edge": ([1,-1,1],[1,-1,-1])
               ,"part_plane": (1,2) #oriented along Y Z plane
-              ,"shrink_edges": {"left": 18.7+130.2, "right": 115.4+18.7}#room for other Top parts
+              ,"shrink_edges": {"left": 148.9, "right": 134.1}#room for other Top parts (l: 18.7+130.2, r: 115.4+18.7)
               ,"shrink_axis": 1 # shrink along Y axis
               })
     ,("Top-iii", { "start_edge": ([1,1,1],[1,1,-1])
               ,"end_edge": ([1,-1,1],[1,-1,-1])
               ,"part_plane": (1,2) #oriented along Y Z plane
-              ,"shrink_edges": {"left": 18.7+130.2+104, "right": 'joint-default' #room for other Top parts
+              ,"shrink_edges": {"left": 252.9, "right": 'joint-default' #room for other Top parts (l: 18.7+130.2+104)
                                 ,"bottom": 'joint-default'}#room for Back part
               ,"shrink_axis": 1 # shrink along Y axis
               })
@@ -76,14 +76,14 @@
     ,("Back-i", { "start_edge": ([1,-1,-1],[-1,-1,-1])
                   ,"end_edge": ([1,1,-1],[-1,1,-1])
                   ,"part_plane": (0,1) #oriented along X Y plane
-                  ,"shrink_edges": {"left": 104+115.4+18.7}#room for other Back parts
+                  ,"shrink_edges": {"left": 238.1}#room for other Back parts (104+115.4+18.7)
                   ,"shrink_axis":1 #Y axis
                   ,"thickness_direction_negative": False
                   })
     ,("Back-ii", { "start_edge": ([1,-1,-1],[-1,-1,-1])
                   ,"end_edge": ([1,1,-1],[-1,1,-1])
                   ,"part_plane": (0,1) #oriented along X Y plane
-                  ,"shrink_edges": {"left": 115.4+18.7, "right": 18.7+130.2#room for other Back parts
+                  ,"shrink_edges": {"left": 134.1, "right": 148.9#room for other Back parts (l: 115.4+18.7, r: 18.7+130.2)
                                     ,"top": 'joint-default'}#room for Top part
                   ,"shrink_axis":1 #Y axis
                   ,"thickness_direction_negative": False
@@ -91,7 +91,7 @@
     ,("Back-iii", { "start_edge": ([1,-1,-1],[-1,-1,-1])
                   ,"end_edge": ([1,1,-1],[-1,1,-1])
                   ,"part_plane": (0,1) #oriented along X Y plane
-                  ,"shrink_edges": {"right": 104+130.2+18.7} #room for other Back parts
+                  ,"shrink_edges": {"right": 252.9} #room for other Back parts (104+130.2+18.7)
                   ,"shrink_axis":1 #Y axis
                   ,"thickness_direction_negative": False
                   })

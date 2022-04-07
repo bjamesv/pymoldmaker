@@ -51,6 +51,8 @@ Check out the latest PyMoldmaker source from GitHub
 
     $ git clone https://github.com/bjamesv/pymoldmaker
 
+Python 3.7+ is required to run the project. Pip `requirements.txt` is provided for creating a suitable Python environment.
+
 A COLLADA file with the outlines of the pieces to be cut superimposed over the original 3d model, can be generated via the PyMoldmaker script `vector.py`.
 
     $ python vector.py --input positive_for_mold.dae
