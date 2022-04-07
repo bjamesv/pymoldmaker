@@ -46,6 +46,8 @@ class Part:
         self.material = material_dict
         self.voids = []
         # list of Parts, representing rectangular holes in this part
+        self.make_args = {}
+        # dictionary of arguments to make_part, which created this Part
 
     
     def __getitem__(self, key):

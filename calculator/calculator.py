@@ -207,7 +207,7 @@ class Calculator(Mesh):
          ' * (112.5 mm, 248.0 mm) section\\n'
          ' * (112.5 mm, 248.0 mm) section\\n'
          ' ### Cutouts (Offset from start corner)\\n'
-         '  #### Hole 1 (50.7 mm, 0.0 mm)\\n'
+         '  #### Hole 1 (38.7 mm, 0.0 mm)\\n'
          '   ** (112.5 mm, 221.3 mm) section\\n'
          '   ** (112.5 mm, 221.3 mm) section\\n'
          '## Left Part\\n'
@@ -485,20 +485,58 @@ class Calculator(Mesh):
         for subtract_part_args in subtract_parts:
             subtract_part = self.make_part(**subtract_part_args)
             part_side.insertSubtractPart(subtract_part)
+
+        # save input parameters
+        part_side.make_args = { "start_edge": start_edge, "end_edge": end_edge
+                               ,"part_plane": part_plane
+                               ,"shrink_edges": shrink_edges
+                               ,"shrink_axis": shrink_axis
+                               ,"thickness_direction_negative": thickness_direction_negative
+                               ,"subtract_parts": subtract_parts}
         return part_side
 
     def get_hole_offset_mm_tuple(self, part, void):
         """
         Compute distance between part and hole start corners
 
-        >>> d = Calculator('test/cube_flipped.dae')
-        >>> part = None #TODO: test
-        >>> void = None
+        >>> d = Calculator('positive_for_mold.dae') #test/cube_flipped.dae')
+        >>> part = d.make_part(start_edge= ([1,-1,-1],[-1,-1,-1])
+        ...          ,end_edge=([1,1,-1],[-1,1,-1])
+        ...          ,part_plane=(0,1) #oriented along X Y plane
+        ...          ,shrink_edges={"right": 104+130.2+18.7} #room for other Back parts
+        ...          ,shrink_axis=1 #Y axis
+        ...          ,subtract_parts=[{ "start_edge": ([1,-1,-1],[-1,-1,-1])
+        ...                               ,"end_edge": ([1,1,-1],[-1,1,-1])
+        ...                               ,"part_plane": (0,1) #oriented along X Y plane
+        ...                               ,"shrink_edges": { "right": 378.7
+        ...                                                 ,"top": 129.4
+        ...                                                 ,"bottom": 106.3}
+        ...                               ,"shrink_axis": 1 #Y axis
+        ...                               ,"thickness_direction_negative": False}]
+        ...          ,thickness_direction_negative=False)
+        >>> void = part.voids[0]
+        >>> #import pdb; pdb.set_trace(); #TODO: remove debug!
         >>> d.get_hole_offset_mm_tuple(part, void)
-        (50.7, 0.0)
+        (129.4, 0.0)
         """
-        primary_axis_offset, secondary_axis_offset = 50.7, 0.0#TODO: implement
-        return (primary_axis_offset, secondary_axis_offset)
+        axis_offset = [50.7, 0.0]#TODO: clean up
+        # get the starting corner, from each shape
+        part_vert1 = part.sections[0].vertici[0]
+        void_vert1 = void.sections[0].vertici[0]
+        # compute first dimension
+        first_dim, second_dim = part.make_args['part_plane']
+        part_dummy_vert = [0, 0, 0]
+        part_dummy_vert[first_dim] = part_vert1[first_dim]
+        void_dummy_vert = [0, 0, 0]
+        void_dummy_vert[first_dim] = void_vert1[first_dim]
+        axis_offset[0] = self.get_mm_dist(part_dummy_vert, void_dummy_vert)
+        # compute second dimension
+        part_dummy_vert = [0, 0, 0]
+        part_dummy_vert[second_dim] = part_vert1[second_dim]
+        void_dummy_vert = [0, 0, 0]
+        void_dummy_vert[second_dim] = void_vert1[second_dim]
+        axis_offset[1] = self.get_mm_dist(part_dummy_vert, void_dummy_vert)
+        return tuple(axis_offset)
 
     def get_collada_unit_dist( self, list_coord_tuple1, list_coord_tuple2):
         """
