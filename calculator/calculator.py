@@ -515,28 +515,23 @@ class Calculator(Mesh):
         ...                               ,"thickness_direction_negative": False}]
         ...          ,thickness_direction_negative=False)
         >>> void = part.voids[0]
-        >>> #import pdb; pdb.set_trace(); #TODO: remove debug!
         >>> d.get_hole_offset_mm_tuple(part, void)
         (129.4, 0.0)
         """
-        axis_offset = [50.7, 0.0]#TODO: clean up
         # get the starting corner, from each shape
         part_vert1 = part.sections[0].vertici[0]
         void_vert1 = void.sections[0].vertici[0]
-        # compute first dimension
+        # get planar axis that the part is aligned along
         first_dim, second_dim = part.make_args['part_plane']
-        part_dummy_vert = [0, 0, 0]
-        part_dummy_vert[first_dim] = part_vert1[first_dim]
-        void_dummy_vert = [0, 0, 0]
-        void_dummy_vert[first_dim] = void_vert1[first_dim]
-        axis_offset[0] = self.get_mm_dist(part_dummy_vert, void_dummy_vert)
-        # compute second dimension
-        part_dummy_vert = [0, 0, 0]
-        part_dummy_vert[second_dim] = part_vert1[second_dim]
-        void_dummy_vert = [0, 0, 0]
-        void_dummy_vert[second_dim] = void_vert1[second_dim]
-        axis_offset[1] = self.get_mm_dist(part_dummy_vert, void_dummy_vert)
-        return tuple(axis_offset)
+        # compute offsets
+        offsets = []
+        for axis in [first_dim, second_dim]:
+            part_dummy_vert = [0, 0, 0]
+            part_dummy_vert[axis] = part_vert1[axis]
+            void_dummy_vert = [0, 0, 0]
+            void_dummy_vert[axis] = void_vert1[axis]
+            offsets.append(self.get_mm_dist(part_dummy_vert, void_dummy_vert))
+        return tuple(offsets)
 
     def get_collada_unit_dist( self, list_coord_tuple1, list_coord_tuple2):
         """

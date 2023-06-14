@@ -91,10 +91,21 @@ class Part:
         >>> p.insertFrontSection(PartSection(l2,(1,0)))
         >>> p.getAsLineSegments()
         [[0, 4, 0], [0, 4, 1], [0, 4, 1], [0, 4, 0], [0, 0, 0], [0, 0, 1], [0, 0, 1], [0, 0, 0]]
+        >>> v = Part() # Void
+        >>> l3 = [[0, 1, 0.2], [0, 1, 0.4]]
+        >>> l4 = [[0, 2, 0.2], [0, 2, 0.4]]
+        >>> v.insertFrontSection(PartSection(l3,(1,0)))
+        >>> v.insertFrontSection(PartSection(l4,(1,0)))
+        >>> p.insertSubtractPart(v)
+        >>> p.getAsLineSegments()
+        [[0, 4, 0], [0, 4, 1], [0, 4, 1], [0, 4, 0], [0, 0, 0], [0, 0, 1], [0, 0, 1], [0, 0, 0], [0, 2, 0.2], [0, 2, 0.4], [0, 2, 0.4], [0, 2, 0.2], [0, 1, 0.2], [0, 1, 0.4], [0, 1, 0.4], [0, 1, 0.2]]
         """
         listReturn = list()
         for section in self.sections:
             listReturn.extend( section.vertici[:])
+            for v in self.voids:  # add segments for any voids
+                for void_section in v.sections:
+                    listReturn.extend(void_section.vertici[:])
         return listReturn
 
 if __name__ == "__main__":
