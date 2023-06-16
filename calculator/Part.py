@@ -43,7 +43,11 @@ class Part:
         , ...] representing a set of line segments, defining the geometry of
         the plaster molding blank's bottom section.
         """
-        self.material = material_dict 
+        self.material = material_dict
+        self.voids = []
+        # list of Parts, representing rectangular holes in this part
+        self.make_args = {}
+        # dictionary of arguments to make_part, which created this Part
 
     
     def __getitem__(self, key):
@@ -61,6 +65,20 @@ class Part:
         """
         self.sections.insert(0, part_section)
 
+    def insertSubtractPart(self, subtract_part):
+        """
+        insert new Part into the 0th index of the voids list
+
+        >>> p, hole1, hole2 = Part(), Part(), Part()
+        >>> p.insertSubtractPart(hole1)
+        >>> p.insertSubtractPart(hole2)
+        >>> p.voids[0] is hole2
+        True
+        >>> p.voids[1] is hole1
+        True
+        """
+        self.voids.insert(0, subtract_part)
+
     def getAsLineSegments( self):
         """
         returns a list of XYZ coord pairs, representing the part.
@@ -73,10 +91,21 @@ class Part:
         >>> p.insertFrontSection(PartSection(l2,(1,0)))
         >>> p.getAsLineSegments()
         [[0, 4, 0], [0, 4, 1], [0, 4, 1], [0, 4, 0], [0, 0, 0], [0, 0, 1], [0, 0, 1], [0, 0, 0]]
+        >>> v = Part() # Void
+        >>> l3 = [[0, 1, 0.2], [0, 1, 0.4]]
+        >>> l4 = [[0, 2, 0.2], [0, 2, 0.4]]
+        >>> v.insertFrontSection(PartSection(l3,(1,0)))
+        >>> v.insertFrontSection(PartSection(l4,(1,0)))
+        >>> p.insertSubtractPart(v)
+        >>> p.getAsLineSegments()
+        [[0, 4, 0], [0, 4, 1], [0, 4, 1], [0, 4, 0], [0, 0, 0], [0, 0, 1], [0, 0, 1], [0, 0, 0], [0, 2, 0.2], [0, 2, 0.4], [0, 2, 0.4], [0, 2, 0.2], [0, 1, 0.2], [0, 1, 0.4], [0, 1, 0.4], [0, 1, 0.2]]
         """
         listReturn = list()
         for section in self.sections:
             listReturn.extend( section.vertici[:])
+            for v in self.voids:  # add segments for any voids
+                for void_section in v.sections:
+                    listReturn.extend(void_section.vertici[:])
         return listReturn
 
 if __name__ == "__main__":

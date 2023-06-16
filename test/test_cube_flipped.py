@@ -156,6 +156,16 @@ def test_back_part_iii_of_v():
     ...              ,"shrink_edges": {"right": 104+130.2+18.7} #room for other Back parts
     ...              ,"shrink_axis": 1 #Y axis
     ...              ,"thickness_direction_negative": False
+    ...              ,"subtract_parts": [{ "start_edge": ([1,-1,-1],[-1,-1,-1])
+    ...                                   ,"end_edge": ([1,1,-1],[-1,1,-1])
+    ...                                   ,"part_plane": (0,1) #oriented along X Y plane
+    ...                                   ,"shrink_edges": {"right": 380.8
+    ...                                   ,"top": 50.6
+    ...                               ,"bottom": 128.6}
+    ...                               ,"shrink_axis": 1 #Y axis
+    ...              ,"thickness_direction_negative": False
+    ...              }
+    ...                                 ]
     ...              }
     >>> vect = Calculator('test/cube_flipped.dae') #577.0 x 271.6mm face
     >>> part = vect.make_part(**test_args)
@@ -164,6 +174,9 @@ def test_back_part_iii_of_v():
     >>> #part width: 271.6-(104+130.2+18.7)+.4/2+.4/2
     >>> [ round(x, 1) for x in part[0].dimensions_mm ] #FIXME: precision finer than 0.1mm should be possible
     [577.4, 19.1]
+    >>> #hole in part: 398.2mm x 109.2mm
+    >>> [round(x, 1) for x in part.voids[0][0].dimensions_mm] #FIXME: precision finer than 0.1mm should be possible
+    [398.2, 109.2]
     """
     pass
 

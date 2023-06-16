@@ -35,9 +35,8 @@ class Canvas:
         color_background = 'white'
         self.image = Image.new(mode, size, color_background)
         #prepare Image for drawing
-        color_lines = 'black'
+        self.color_lines = 'black'
         self.draw = ImageDraw.Draw(self.image)
-        self.draw.setink( color_lines)
     
     def draw_line(self, poly_line_mm):
         """
@@ -46,7 +45,7 @@ class Canvas:
         of a polygonal shape in milimeters.
         """
         # now draw something onto it
-        self.draw.line( poly_line_mm)
+        self.draw.line(poly_line_mm, fill=self.color_lines)
         
     def save(self,  destination):
         """ saves the internal image representation to the specified path or
